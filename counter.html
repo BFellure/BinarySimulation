@@ -54,36 +54,35 @@
             margin: 5px 0;
         }
 
-        /* Traveling Sweep Animation Track */
+        /* Curved Jump Arrow Container */
         .sweep-track {
             width: 100%;
-            height: 24px;
+            height: 32px;
             position: relative;
             margin-bottom: -5px;
         }
-        .traveling-arrow {
+        .curved-arrow {
             position: absolute;
-            font-size: 1.1rem;
-            font-weight: 900;
-            color: #3b82f6;
+            top: 0;
+            left: 0;
+            width: 1000px;
+            height: 30px;
+            fill: none;
+            stroke: #3b82f6;
+            stroke-width: 3;
+            stroke-dasharray: 400;
+            stroke-dashoffset: 400;
             opacity: 0;
-            transition: none;
         }
 
-        @keyframes sweepRightToLeft {
-            0% { transform: translateX(420px); opacity: 1; }
-            100% { transform: translateX(0px); opacity: 1; }
-        }
-        @keyframes sweepLeftToRight {
-            0% { transform: translateX(0px); opacity: 1; }
-            100% { transform: translateX(420px); opacity: 1; }
+        @keyframes drawArc {
+            0% { stroke-dashoffset: 400; opacity: 1; }
+            80% { opacity: 1; }
+            100% { stroke-dashoffset: 0; opacity: 0; }
         }
 
-        .traveling-arrow.animate-right-left {
-            animation: sweepRightToLeft 0.5s ease-out forwards;
-        }
-        .traveling-arrow.animate-left-right {
-            animation: sweepLeftToRight 0.5s ease-out forwards;
+        .curved-arrow.animate-arc {
+            animation: drawArc 0.6s ease-in-out forwards;
         }
 
         /* 8-Bit Bulbs Container */
@@ -179,9 +178,16 @@
         <!-- Big Decimal Number Readout -->
         <div class="decimal-display" id="decimalOutput">0</div>
 
-        <!-- Traveling Shift Animation Track -->
+        <!-- Curved Carry/Shift Arc Animation Track -->
         <div class="sweep-track">
-            <div class="traveling-arrow" id="sweepArrow">➔</div>
+            <svg class="curved-arrow" id="carryArc" viewBox="0 0 450 30">
+                <path id="arcPath" d="M 400,25 Q 225,-10 50,25" marker-end="url(#arrowhead)"/>
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6"/>
+                    </marker>
+                </defs>
+            </svg>
         </div>
 
         <!-- 8 Bulbs Representing Bits (Bit 7 down to Bit 0) -->
@@ -236,7 +242,6 @@
     let autoDirection = 1;
 
     function updateDisplay(oldValue, newValue, direction = 1) {
-        // Keep within 8-bit bounds (0 to 255) with wrap-around
         counterValue = (newValue + 256) % 256;
         let oldValMasked = (oldValue + 256) % 256;
 
@@ -257,7 +262,6 @@
                 bulb.classList.remove('lit');
             }
 
-            // Trigger bit-flip pulse animation on changed bits
             if (oldBinary[i] !== newBinary[i]) {
                 bulb.classList.remove('flipped');
                 void bulb.offsetWidth;
@@ -265,25 +269,15 @@
             }
         }
 
-        // Trigger traveling sweep animation
-        triggerSweep(direction);
-
-        // Update big decimal display
+        triggerCarryArc(direction);
         document.getElementById('decimalOutput').textContent = counterValue;
     }
 
-    function triggerSweep(direction) {
-        const arrow = document.getElementById('sweepArrow');
-        arrow.className = 'traveling-arrow'; // reset animation
-        void arrow.offsetWidth; // force reflow
-
-        if (direction > 0) {
-            arrow.textContent = '◄'; // moving towards higher bits (carry right-to-left)
-            arrow.classList.add('animate-right-left');
-        } else {
-            arrow.textContent = '►'; // borrowing left-to-right
-            arrow.classList.add('animate-left-right');
-        }
+    function triggerCarryArc(direction) {
+        const arc = document.getElementById('carryArc');
+        arc.classList.remove('animate-arc');
+        void arc.offsetWidth; // force reflow
+        arc.classList.add('animate-arc');
     }
 
     function stepCounter(direction) {
@@ -316,7 +310,7 @@
 
                 let prev = counterValue;
                 updateDisplay(prev, counterValue + autoDirection, autoDirection);
-            }, 900); // Slower interval (900ms per count step)
+            }, 900); // Slow 900ms interval
             btn.textContent = 'Stop Auto';
             btn.style.background = '#ef4444';
         }
