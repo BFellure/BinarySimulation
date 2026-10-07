@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Signal Simulator: Switch & Bulb</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .widget-container {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+        }
+        h3 {
+            margin-top: 0;
+            color: #1e293b;
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+        }
+        .interactive-stage {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: #0f172a;
+            padding: 30px 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            min-height: 200px;
+        }
+        /* Physical Switch Styling */
+        .switch-plate {
+            background: #e2e8f0;
+            width: 70px;
+            height: 130px;
+            border-radius: 8px;
+            border: 2px solid #cbd5e1;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+        .switch-toggle {
+            background: #ffffff;
+            width: 34px;
+            height: 60px;
+            border-radius: 4px;
+            border: 1px solid #94a3b8;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        /* Switch State Top/Bottom Shadow Illusion */
+        .switch-plate.off .switch-toggle {
+            transform: translateY(12px);
+            box-shadow: 0 -3px 4px rgba(0,0,0,0.1) inset, 0 2px 4px rgba(0,0,0,0.2);
+            background: #f1f5f9;
+        }
+        .switch-plate.on .switch-toggle {
+            transform: translateY(-12px);
+            box-shadow: 0 3px 4px rgba(0,0,0,0.1) inset, 0 4px 8px rgba(59,130,246,0.3);
+            background: #fff;
+        }
+        /* Graphic Lightbulb Container */
+        .bulb-box {
+            position: relative;
+            width: 90px;
+            height: 130px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .bulb-glass {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid #64748b;
+            background: #334155;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .bulb-base {
+            width: 34px;
+            height: 18px;
+            background: #94a3b8;
+            border-radius: 0 0 4px 4px;
+            margin-top: -2px;
+            border: 2px solid #64748b;
+            border-top: none;
+        }
+        .bulb-contact {
+            width: 16px;
+            height: 6px;
+            background: #475569;
+            border-radius: 0 0 3px 3px;
+        }
+        /* Active Glowing Bulb */
+        .switch-plate.on ~ .bulb-box .bulb-glass {
+            background: #fef08a;
+            border-color: #eab308;
+            box-shadow: 0 0 35px #fde047;
+        }
+        /* Binary Digit Overlay */
+        .binary-display {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #94a3b8;
+            user-select: none;
+            transition: color 0.2s ease;
+        }
+        .switch-plate.on ~ .bulb-box .binary-display {
+            color: #ca8a04;
+        }
+        /* Explanation Box */
+        .status-text {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #334155;
+            font-weight: 500;
+        }
+        .highlight {
+            font-weight: 700;
+        }
+        .digital-color { color: #ef4444; }
+        .analog-color { color: #3b82f6; }
+    </style>
+</head>
+<body>
+
+<div class="widget-container">
+    <h3>Binary Input/Output Experiment</h3>
+    
+    <div class="interactive-stage">
+        <!-- The Interactive Toggle Switch -->
+        <div class="switch-plate off" id="lightSwitch" onclick="toggleSwitch()">
+            <div class="switch-toggle"></div>
+        </div>
+        
+        <!-- The Lightbulb displaying Binary Status -->
+        <div class="bulb-box">
+            <div class="bulb-glass">
+                <span class="binary-display" id="digitDisplay">0</span>
+            </div>
+            <div class="bulb-base"></div>
+            <div class="bulb-contact"></div>
+        </div>
+    </div>
+    
+    <div class="status-text" id="statusMessage">
+        The switch is <span class="highlight">OFF</span>. Circuit output translates to a digital <span class="highlight digital-color">0</span> (False/No Signal).
+    </div>
+</div>
+
+<script>
+    function toggleSwitch() {
+        const sw = document.getElementById('lightSwitch');
+        const digit = document.getElementById('digitDisplay');
+        const msg = document.getElementById('statusMessage');
+        
+        if (sw.classList.contains('off')) {
+            // Turn ON
+            sw.classList.remove('off');
+            sw.classList.add('on');
+            digit.textContent = '1';
+            msg.innerHTML = 'The switch is <span class="highlight">ON</span>. Circuit output translates to a digital <span class="highlight digital-color">1</span> (True/Active Signal).';
+        } else {
+            // Turn OFF
+            sw.classList.remove('on');
+            sw.classList.add('off');
+            digit.textContent = '0';
+            msg.innerHTML = 'The switch is <span class="highlight">OFF</span>. Circuit output translates to a digital <span class="highlight digital-color">0</span> (False/No Signal).';
+        }
+    }
+</script>
+
+</body>
+</html>
