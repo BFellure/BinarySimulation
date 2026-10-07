@@ -27,12 +27,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 25px;
+            gap: 20px;
             background: rgba(255, 255, 255, 0.85);
             padding: 25px 35px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             border: 1px solid #e2e8f0;
+            position: relative;
         }
         .title {
             font-size: 1.1rem;
@@ -53,6 +54,38 @@
             margin: 5px 0;
         }
 
+        /* Traveling Sweep Animation Track */
+        .sweep-track {
+            width: 100%;
+            height: 24px;
+            position: relative;
+            margin-bottom: -5px;
+        }
+        .traveling-arrow {
+            position: absolute;
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #3b82f6;
+            opacity: 0;
+            transition: none;
+        }
+
+        @keyframes sweepRightToLeft {
+            0% { transform: translateX(420px); opacity: 1; }
+            100% { transform: translateX(0px); opacity: 1; }
+        }
+        @keyframes sweepLeftToRight {
+            0% { transform: translateX(0px); opacity: 1; }
+            100% { transform: translateX(420px); opacity: 1; }
+        }
+
+        .traveling-arrow.animate-right-left {
+            animation: sweepRightToLeft 0.3s ease-out forwards;
+        }
+        .traveling-arrow.animate-left-right {
+            animation: sweepLeftToRight 0.3s ease-out forwards;
+        }
+
         /* 8-Bit Bulbs Container */
         .bits-row {
             display: flex;
@@ -68,23 +101,6 @@
             font-size: 0.7rem;
             font-weight: 600;
             color: #64748b;
-        }
-        
-        /* Shift Arrow Indicator */
-        .shift-arrow {
-            font-size: 0.9rem;
-            font-weight: 900;
-            height: 16px;
-            visibility: hidden;
-            transition: opacity 0.2s;
-        }
-        .shift-arrow.up {
-            color: #16a34a;
-            visibility: visible;
-        }
-        .shift-arrow.down {
-            color: #dc2626;
-            visibility: visible;
         }
 
         .bulb-glass {
@@ -129,6 +145,7 @@
             display: flex;
             gap: 12px;
             align-items: center;
+            margin-top: 5px;
         }
         .sim-btn {
             background: #3b82f6;
@@ -162,45 +179,42 @@
         <!-- Big Decimal Number Readout -->
         <div class="decimal-display" id="decimalOutput">0</div>
 
+        <!-- Traveling Shift Animation Track -->
+        <div class="sweep-track">
+            <div class="traveling-arrow" id="sweepArrow">➔</div>
+        </div>
+
         <!-- 8 Bulbs Representing Bits (Bit 7 down to Bit 0) -->
         <div class="bits-row">
             <div class="bit-box">
-                <span class="shift-arrow" id="arrow7">▲</span>
                 <span class="bit-label">128</span>
                 <div class="bulb-glass" id="bit7"><span class="binary-digit" id="val7">0</span></div>
             </div>
             <div class="bit-box">
-                <span class="shift-arrow" id="arrow6">▲</span>
                 <span class="bit-label">64</span>
                 <div class="bulb-glass" id="bit6"><span class="binary-digit" id="val6">0</span></div>
             </div>
             <div class="bit-box">
-                <span class="shift-arrow" id="arrow5">▲</span>
                 <span class="bit-label">32</span>
                 <div class="bulb-glass" id="bit5"><span class="binary-digit" id="val5">0</span></div>
             </div>
             <div class="bit-box">
-                <span class="shift-arrow" id="arrow4">▲</span>
                 <span class="bit-label">16</span>
                 <div class="bulb-glass" id="bit4"><span class="binary-digit" id="val4">0</span></div>
             </div>
             <div class="bit-box">
-                <span class="shift-arrow" id="arrow3">▲</span>
                 <span class="bit-label">8</span>
                 <div class="bulb-glass" id="bit3"><span class="binary-digit" id="val3">0</span></div>
             </div>
             <div class="bit-box">
-                <span class="shift-arrow" id="arrow2">▲</span>
                 <span class="bit-label">4</span>
                 <div class="bulb-glass" id="bit2"><span class="binary-digit" id="val2">0</span></div>
             </div>
             <div class="bit-box">
-                <span class="shift-arrow" id="arrow1">▲</span>
                 <span class="bit-label">2</span>
                 <div class="bulb-glass" id="bit1"><span class="binary-digit" id="val1">0</span></div>
             </div>
             <div class="bit-box">
-                <span class="shift-arrow" id="arrow0">▲</span>
                 <span class="bit-label">1</span>
                 <div class="bulb-glass" id="bit0"><span class="binary-digit" id="val0">0</span></div>
             </div>
@@ -221,7 +235,7 @@
     let autoInterval = null;
     let autoDirection = 1;
 
-    function updateDisplay(oldValue, newValue) {
+    function updateDisplay(oldValue, newValue, direction = 1) {
         // Keep within 8-bit bounds (0 to 255) with wrap-around
         counterValue = (newValue + 256) % 256;
         let oldValMasked = (oldValue + 256) % 256;
@@ -230,11 +244,10 @@
         const newBinary = counterValue.toString(2).padStart(8, '0');
 
         for (let i = 0; i < 8; i++) {
-            const bitIndex = 7 - i; // maps loop index to bits 7 down to 0
+            const bitIndex = 7 - i;
             const bitVal = newBinary[i];
             const bulb = document.getElementById(`bit${bitIndex}`);
             const valSpan = document.getElementById(`val${bitIndex}`);
-            const arrow = document.getElementById(`arrow${bitIndex}`);
 
             valSpan.textContent = bitVal;
 
@@ -244,33 +257,38 @@
                 bulb.classList.remove('lit');
             }
 
-            // Check if bit changed state to trigger animation and directional arrow
+            // Trigger bit-flip pulse animation on changed bits
             if (oldBinary[i] !== newBinary[i]) {
                 bulb.classList.remove('flipped');
-                void bulb.offsetWidth; // Force reflow
+                void bulb.offsetWidth;
                 bulb.classList.add('flipped');
-
-                // Set arrow direction (Up if turned to 1, Down if turned to 0)
-                if (bitVal === '1') {
-                    arrow.textContent = '▲';
-                    arrow.className = 'shift-arrow up';
-                } else {
-                    arrow.textContent = '▼';
-                    arrow.className = 'shift-arrow down';
-                }
-            } else {
-                // Clear arrow if bit didn't change this step
-                arrow.className = 'shift-arrow';
             }
         }
+
+        // Trigger traveling sweep animation
+        triggerSweep(direction);
 
         // Update big decimal display
         document.getElementById('decimalOutput').textContent = counterValue;
     }
 
+    function triggerSweep(direction) {
+        const arrow = document.getElementById('sweepArrow');
+        arrow.className = 'traveling-arrow'; // reset animation
+        void arrow.offsetWidth; // force reflow
+
+        if (direction > 0) {
+            arrow.textContent = '◄'; // moving towards higher bits (carry right-to-left)
+            arrow.classList.add('animate-right-left');
+        } else {
+            arrow.textContent = '►'; // borrowing left-to-right
+            arrow.classList.add('animate-left-right');
+        }
+    }
+
     function stepCounter(direction) {
         let prev = counterValue;
-        updateDisplay(prev, counterValue + direction);
+        updateDisplay(prev, counterValue + direction, direction);
     }
 
     function resetCounter() {
@@ -281,7 +299,7 @@
             document.getElementById('autoBtn').textContent = 'Auto Count';
             document.getElementById('autoBtn').style.background = '#64748b';
         }
-        updateDisplay(prev, 0);
+        updateDisplay(prev, 0, 1);
     }
 
     function toggleAutoPlay() {
@@ -297,15 +315,15 @@
                 if (counterValue === 0) autoDirection = 1;
 
                 let prev = counterValue;
-                updateDisplay(prev, counterValue + autoDirection);
-            }, 300);
+                updateDisplay(prev, counterValue + autoDirection, autoDirection);
+            }, 350);
             btn.textContent = 'Stop Auto';
             btn.style.background = '#ef4444';
         }
     }
 
     // Initialize display
-    updateDisplay(0, 0);
+    updateDisplay(0, 0, 1);
 </script>
 
 </body>
