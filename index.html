@@ -13,7 +13,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: transparent; /* Allows your site background to show through */
+            background: transparent;
             overflow: hidden;
             font-family: system-ui, -apple-system, sans-serif;
         }
@@ -140,28 +140,42 @@
             color: #ca8a04;
         }
 
-        /* Analog Slider & Controls Styling */
+        /* Analog Rotary Knob & Controls Styling */
         .analog-controls {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
-        .analog-slider {
-            -webkit-appearance: slider-vertical;
-            width: 25px;
-            height: 110px;
+        .knob-container {
+            width: 70px;
+            height: 70px;
             background: #e2e8f0;
-            outline: none;
-            border-radius: 6px;
-            border: 2px solid #cbd5e1;
+            border: 3px solid #cbd5e1;
+            border-radius: 50%;
+            position: relative;
             cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .knob-indicator {
+            width: 4px;
+            height: 24px;
+            background: #475569;
+            position: absolute;
+            top: 4px;
+            border-radius: 2px;
+            transform-origin: bottom center;
+            transform: translateY(11px) rotate(-135deg);
+            transition: transform 0.05s ease-out;
         }
         .mute-btn {
             background: #ef4444;
             color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 6px 12px;
             font-size: 0.75rem;
             font-weight: 700;
             border-radius: 4px;
@@ -262,7 +276,10 @@
             <span class="section-label">Analog (Frequency & Tone)</span>
             <div class="device-panel">
                 <div class="analog-controls">
-                    <input type="range" min="100" max="1000" value="100" class="analog-slider" id="analogSlider" oninput="updateAnalog(this.value)">
+                    <!-- Rotary Dial Knob -->
+                    <div class="knob-container" id="analogKnob" title="Click and drag up/down to turn">
+                        <div class="knob-indicator" id="knobIndicator"></div>
+                    </div>
                     <button class="mute-btn muted" id="muteBtn" onclick="toggleMute()">Unmute Audio</button>
                 </div>
                 
@@ -305,6 +322,7 @@
     let oscillator = null;
     let gainNode = null;
     let isMuted = true;
+    let currentVal = 100; // Frequency 100Hz to 1000Hz
 
     function initAudio() {
         if (!audioCtx) {
@@ -313,7 +331,7 @@
             gainNode = audioCtx.createGain();
 
             oscillator.type = 'sine'; // Smooth analog sine wave
-            oscillator.frequency.setValueAtTime(100, audioCtx.currentTime);
+            oscillator.frequency.setValueAtTime(currentVal, audioCtx.currentTime);
             
             gainNode.gain.setValueAtTime(0, audioCtx.currentTime); // Start silent
 
@@ -337,30 +355,62 @@
             muteBtn.textContent = 'Unmute Audio';
             muteBtn.classList.add('muted');
         } else {
-            gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime); // Set safe volume level
+            gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime); // Safe volume level
             muteBtn.textContent = 'Mute Audio';
             muteBtn.classList.remove('muted');
         }
     }
 
-    function updateAnalog(val) {
-        const frequency = parseInt(val);
+    function setAnalogValue(val) {
+        currentVal = Math.max(100, Math.min(1000, val));
         const gaugeNeedle = document.getElementById('gaugeNeedle');
+        const knobIndicator = document.getElementById('knobIndicator');
         const analogDigit = document.getElementById('analogDigit');
 
         // Update Text Readout
-        analogDigit.textContent = frequency + ' Hz';
+        analogDigit.textContent = Math.round(currentVal) + ' Hz';
 
-        // Map 100-1000 Hz slider range to -90deg (left) to +90deg (right) needle rotation
-        const percent = (frequency - 100) / 900;
-        const degrees = -90 + (percent * 180);
-        gaugeNeedle.style.transform = `rotate(${degrees}deg)`;
+        // Calculate percentage (0 to 1)
+        const percent = (currentVal - 100) / 900;
 
-        // Update Oscillator frequency if audio is initialized
+        // Update Gauge Needle Rotation (-90deg to +90deg)
+        const gaugeDegrees = -90 + (percent * 180);
+        gaugeNeedle.style.transform = `rotate(${gaugeDegrees}deg)`;
+
+        // Update Rotary Knob Rotation (-135deg to +135deg)
+        const knobDegrees = -135 + (percent * 270);
+        knobIndicator.style.transform = `translateY(11px) rotate(${knobDegrees}deg)`;
+
+        // Update Audio Frequency
         if (audioCtx && oscillator) {
-            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            oscillator.frequency.setValueAtTime(currentVal, audioCtx.currentTime);
         }
     }
+
+    // Rotary Knob Drag Interaction
+    const knob = document.getElementById('analogKnob');
+    let isDragging = false;
+    let startY = 0;
+    let startVal = 100;
+
+    knob.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startY = e.clientY;
+        startVal = currentVal;
+        document.body.style.cursor = 'ns-resize';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const deltaY = startY - e.clientY; // Dragging up increases value
+        const newVal = startVal + (deltaY * 3);
+        setAnalogValue(newVal);
+    });
+
+    window.addEventListener('mouseup', () => {
+        isDragging = false;
+        document.body.style.cursor = 'default';
+    });
 </script>
 
 </body>
