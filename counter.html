@@ -14,7 +14,7 @@
             align-items: center;
             min-height: 100vh;
             background: transparent;
-            overflow: hidden;
+            overflow-x: hidden;
             font-family: system-ui, -apple-system, sans-serif;
         }
         .main-container {
@@ -22,6 +22,7 @@
             flex-direction: column;
             align-items: center;
             gap: 20px;
+            padding: 20px;
         }
         .interactive-stage {
             display: flex;
@@ -67,17 +68,14 @@
         .toggle-view-btn:hover {
             background: #e2e8f0;
         }
-        
-        /* Views */
+
+        /* Simulator View Panel */
         .view-panel {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 20px;
             width: 100%;
-        }
-        .view-panel.hidden {
-            display: none;
         }
 
         /* Big Decimal Number Display */
@@ -162,30 +160,38 @@
             color: #ca8a04;
         }
 
-        /* Math Explanation View Styling */
+        /* Math Dropdown Section (Initially Hidden) */
+        .math-dropdown {
+            width: 100%;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            box-sizing: border-box;
+        }
+        .math-dropdown.open {
+            max-height: 250px;
+            padding: 15px;
+            border-color: #e2e8f0;
+        }
         .math-content {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            width: 100%;
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            box-sizing: border-box;
-            font-size: 0.9rem;
+            gap: 10px;
+            font-size: 0.85rem;
             color: #334155;
-            min-height: 190px;
         }
         .math-equation {
             font-family: monospace;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             background: #fff;
-            padding: 10px;
+            padding: 8px;
             border-radius: 6px;
             border: 1px solid #cbd5e1;
-            word-break: break-all;
             text-align: center;
+            word-break: break-all;
         }
         .math-breakdown-list {
             list-style: none;
@@ -194,11 +200,11 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 6px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
         .math-item {
             background: #fff;
-            padding: 6px;
+            padding: 5px;
             border-radius: 4px;
             border: 1px solid #e2e8f0;
             text-align: center;
@@ -240,7 +246,7 @@
     <div class="interactive-stage">
         <div class="header-row">
             <h2 class="title">8-Bit Up/Down Binary Counter</h2>
-            <button class="toggle-view-btn" id="toggleBtn" onclick="toggleView()">Explain Math</button>
+            <button class="toggle-view-btn" id="toggleBtn" onclick="toggleMathDropdown()">Explain Math ▼</button>
         </div>
 
         <!-- SIMULATOR VIEW -->
@@ -290,11 +296,11 @@
             </div>
         </div>
 
-        <!-- MATH EXPLANATION VIEW -->
-        <div class="view-panel hidden" id="mathView">
+        <!-- MATH EXPLANATION DROPDOWN (Directly Below) -->
+        <div class="math-dropdown" id="mathDropdown">
             <div class="math-content">
-                <strong>How Binary Calculation Works:</strong>
-                <p style="margin: 0; font-size: 0.85rem; color: #64748b;">Each bit position represents a power of 2 ($2^7$ down to $2^0$). To find the decimal number, we multiply each bit ($0$ or $1$) by its place value and add them together:</p>
+                <strong>Binary Calculation Breakdown:</strong>
+                <p style="margin: 0; color: #64748b; font-size: 0.8rem;">Sum of active place values ($128$ down to $1$):</p>
                 <div class="math-equation" id="mathEquation">0 = 0</div>
                 <ul class="math-breakdown-list" id="mathList">
                     <!-- Populated dynamically -->
@@ -316,23 +322,20 @@
     let counterValue = 0;
     let autoInterval = null;
     let autoDirection = 1;
-    let isMathView = false;
+    let isMathOpen = false;
 
-    function toggleView() {
-        isMathView = !isMathView;
-        const simView = document.getElementById('simView');
-        const mathView = document.getElementById('mathView');
+    function toggleMathDropdown() {
+        isMathOpen = !isMathOpen;
+        const dropdown = document.getElementById('mathDropdown');
         const toggleBtn = document.getElementById('toggleBtn');
 
-        if (isMathView) {
-            simView.classList.add('hidden');
-            mathView.classList.remove('hidden');
-            toggleBtn.textContent = 'Back to Simulator';
+        if (isMathOpen) {
+            dropdown.classList.add('open');
+            toggleBtn.textContent = 'Explain Math ▲';
             updateMathExplanation();
         } else {
-            mathView.classList.add('hidden');
-            simView.classList.remove('hidden');
-            toggleBtn.textContent = 'Explain Math';
+            dropdown.classList.remove('open');
+            toggleBtn.textContent = 'Explain Math ▼';
         }
     }
 
@@ -382,83 +385,4 @@
             let targetArrow = document.getElementById(`gap${highestChangedBit}_${highestChangedBit - 1}`);
             if (targetArrow) {
                 targetArrow.textContent = direction > 0 ? '◀' : '▶';
-                targetArrow.classList.add('active');
-            }
-        }
-
-        document.getElementById('decimalOutput').textContent = counterValue;
-
-        if (isMathView) {
-            updateMathExplanation();
-        }
-    }
-
-    function updateMathExplanation() {
-        const powers = [128, 64, 32, 16, 8, 4, 2, 1];
-        const binaryString = counterValue.toString(2).padStart(8, '0');
-        
-        let equationParts = [];
-        let activeTerms = [];
-        let listHtml = '';
-
-        for (let i = 0; i < 8; i++) {
-            let bitVal = parseInt(binaryString[i]);
-            let weight = powers[i];
-            let product = bitVal * weight;
-
-            equationParts.join('');
-            if (bitVal === 1) {
-                activeTerms.push(`${weight}`);
-            }
-
-            listHtml += `<li class="math-item"><b>${weight}</b> × ${bitVal} = ${product}</li>`;
-        }
-
-        let equationString = activeTerms.length > 0 ? activeTerms.join(' + ') + ` = ${counterValue}` : `0 = 0`;
-        
-        document.getElementById('mathEquation').textContent = equationString;
-        document.getElementById('mathList').innerHTML = listHtml;
-    }
-
-    function stepCounter(direction) {
-        let prev = counterValue;
-        updateDisplay(prev, counterValue + direction, direction);
-    }
-
-    function resetCounter() {
-        let prev = counterValue;
-        if (autoInterval) {
-            clearInterval(autoInterval);
-            autoInterval = null;
-            document.getElementById('autoBtn').textContent = 'Auto Count';
-            document.getElementById('autoBtn').style.background = '#64748b';
-        }
-        updateDisplay(prev, 0, 1);
-    }
-
-    function toggleAutoPlay() {
-        const btn = document.getElementById('autoBtn');
-        if (autoInterval) {
-            clearInterval(autoInterval);
-            autoInterval = null;
-            btn.textContent = 'Auto Count';
-            btn.style.background = '#64748b';
-        } else {
-            autoInterval = setInterval(() => {
-                if (counterValue === 255) autoDirection = -1;
-                if (counterValue === 0) autoDirection = 1;
-
-                let prev = counterValue;
-                updateDisplay(prev, counterValue + autoDirection, autoDirection);
-            }, 900);
-            btn.textContent = 'Stop Auto';
-            btn.style.background = '#ef4444';
-        }
-    }
-
-    // Initialize display
-    updateDisplay(0, 0, 1);
-</script>
-
-</body>
-</html>
+                target
