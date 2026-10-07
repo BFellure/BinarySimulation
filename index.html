@@ -169,7 +169,6 @@
             border-radius: 2px;
             transform-origin: bottom center;
             transform: translateY(11px) rotate(-135deg);
-            transition: transform 0.05s ease-out;
         }
         .mute-btn {
             background: #ef4444;
@@ -273,11 +272,11 @@
 
         <!-- Analog Section with Dial and Audio -->
         <div class="section-box">
-            <span class="section-label">Analog (Frequency & Tone)</span>
+            <span class="section-label">Analog</span>
             <div class="device-panel">
                 <div class="analog-controls">
                     <!-- Rotary Dial Knob -->
-                    <div class="knob-container" id="analogKnob" title="Click and drag up/down to turn">
+                    <div class="knob-container" id="analogKnob" title="Click and drag in a circle to turn">
                         <div class="knob-indicator" id="knobIndicator"></div>
                     </div>
                     <button class="mute-btn muted" id="muteBtn" onclick="toggleMute()">Unmute Audio</button>
@@ -387,29 +386,48 @@
         }
     }
 
-    // Rotary Knob Drag Interaction
+    // Radial Mouse Drag Interaction
     const knob = document.getElementById('analogKnob');
     let isDragging = false;
-    let startY = 0;
-    let startVal = 100;
 
     knob.addEventListener('mousedown', (e) => {
         isDragging = true;
-        startY = e.clientY;
-        startVal = currentVal;
-        document.body.style.cursor = 'ns-resize';
+        document.body.style.cursor = 'grabbing';
+        e.preventDefault();
     });
 
     window.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
-        const deltaY = startY - e.clientY; // Dragging up increases value
-        const newVal = startVal + (deltaY * 3);
+
+        const rect = knob.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        // Calculate angle of mouse relative to the knob center (in radians)
+        const radians = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+        let degrees = radians * (180 / Math.PI);
+
+        // Normalize degrees to range from -180 to 180, mapping the bottom gap nicely
+        // We'll map a 270-degree sweep starting from bottom-left (-135°) to bottom-right (+135°)
+        degrees += 90; 
+        if (degrees < -180) degrees += 360;
+        if (degrees > 180) degrees -= 360;
+
+        // Constrain movement within the valid dial limits (-135deg to +135deg)
+        const clampedDeg = Math.max(-135, Math.min(135, degrees));
+        
+        // Map degrees back to frequency (100Hz to 1000Hz)
+        const percent = (clampedDeg + 135) / 270;
+        const newVal = 100 + (percent * 900);
+
         setAnalogValue(newVal);
     });
 
     window.addEventListener('mouseup', () => {
-        isDragging = false;
-        document.body.style.cursor = 'default';
+        if (isDragging) {
+            isDragging = false;
+            document.body.style.cursor = 'default';
+        }
     });
 </script>
 
