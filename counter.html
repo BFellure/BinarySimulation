@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4-Bit Up/Down Binary Counter Simulator</title>
+    <title>8-Bit Up/Down Binary Counter Simulator</title>
     <style>
         body {
             margin: 0;
@@ -43,25 +43,53 @@
             margin: 0;
         }
         
-        /* 4-Bit Bulbs Container */
+        /* Big Decimal Number Display */
+        .decimal-display {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1;
+            user-select: none;
+            margin: 5px 0;
+        }
+
+        /* 8-Bit Bulbs Container */
         .bits-row {
             display: flex;
-            gap: 20px;
+            gap: 12px;
         }
         .bit-box {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .bit-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             color: #64748b;
         }
+        
+        /* Shift Arrow Indicator */
+        .shift-arrow {
+            font-size: 0.9rem;
+            font-weight: 900;
+            height: 16px;
+            visibility: hidden;
+            transition: opacity 0.2s;
+        }
+        .shift-arrow.up {
+            color: #16a34a;
+            visibility: visible;
+        }
+        .shift-arrow.down {
+            color: #dc2626;
+            visibility: visible;
+        }
+
         .bulb-glass {
-            width: 60px;
-            height: 60px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             border: 3px solid #64748b;
             background: #cbd5e1;
@@ -73,13 +101,13 @@
         .bulb-glass.lit {
             background: #fef08a;
             border-color: #eab308;
-            box-shadow: 0 0 25px #fde047;
+            box-shadow: 0 0 20px #fde047;
         }
         
         /* Bit Flip Animation Effect */
         @keyframes bitPulse {
             0% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.2); filter: brightness(1.3); }
+            50% { transform: scale(1.15); filter: brightness(1.3); }
             100% { transform: scale(1); filter: brightness(1); }
         }
         .bulb-glass.flipped {
@@ -87,7 +115,7 @@
         }
 
         .binary-digit {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: #475569;
             user-select: none;
@@ -123,53 +151,66 @@
         .sim-btn.secondary:hover {
             background: #475569;
         }
-
-        /* Decimal Output Display */
-        .decimal-readout {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #475569;
-            background: #f1f5f9;
-            padding: 6px 16px;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-        }
     </style>
 </head>
 <body>
 
 <div class="main-container">
     <div class="interactive-stage">
-        <h2 class="title">4-Bit Up/Down Binary Counter</h2>
+        <h2 class="title">8-Bit Up/Down Binary Counter</h2>
 
-        <!-- 4 Bulbs Representing Bits (MSB on left, LSB on right) -->
+        <!-- Big Decimal Number Readout -->
+        <div class="decimal-display" id="decimalOutput">0</div>
+
+        <!-- 8 Bulbs Representing Bits (Bit 7 down to Bit 0) -->
         <div class="bits-row">
             <div class="bit-box">
-                <span class="bit-label">Bit 3 (8)</span>
+                <span class="shift-arrow" id="arrow7">▲</span>
+                <span class="bit-label">128</span>
+                <div class="bulb-glass" id="bit7"><span class="binary-digit" id="val7">0</span></div>
+            </div>
+            <div class="bit-box">
+                <span class="shift-arrow" id="arrow6">▲</span>
+                <span class="bit-label">64</span>
+                <div class="bulb-glass" id="bit6"><span class="binary-digit" id="val6">0</span></div>
+            </div>
+            <div class="bit-box">
+                <span class="shift-arrow" id="arrow5">▲</span>
+                <span class="bit-label">32</span>
+                <div class="bulb-glass" id="bit5"><span class="binary-digit" id="val5">0</span></div>
+            </div>
+            <div class="bit-box">
+                <span class="shift-arrow" id="arrow4">▲</span>
+                <span class="bit-label">16</span>
+                <div class="bulb-glass" id="bit4"><span class="binary-digit" id="val4">0</span></div>
+            </div>
+            <div class="bit-box">
+                <span class="shift-arrow" id="arrow3">▲</span>
+                <span class="bit-label">8</span>
                 <div class="bulb-glass" id="bit3"><span class="binary-digit" id="val3">0</span></div>
             </div>
             <div class="bit-box">
-                <span class="bit-label">Bit 2 (4)</span>
+                <span class="shift-arrow" id="arrow2">▲</span>
+                <span class="bit-label">4</span>
                 <div class="bulb-glass" id="bit2"><span class="binary-digit" id="val2">0</span></div>
             </div>
             <div class="bit-box">
-                <span class="bit-label">Bit 1 (2)</span>
+                <span class="shift-arrow" id="arrow1">▲</span>
+                <span class="bit-label">2</span>
                 <div class="bulb-glass" id="bit1"><span class="binary-digit" id="val1">0</span></div>
             </div>
             <div class="bit-box">
-                <span class="bit-label">Bit 0 (1)</span>
+                <span class="shift-arrow" id="arrow0">▲</span>
+                <span class="bit-label">1</span>
                 <div class="bulb-glass" id="bit0"><span class="binary-digit" id="val0">0</span></div>
             </div>
         </div>
-
-        <!-- Decimal Readout -->
-        <div class="decimal-readout" id="decimalOutput">Decimal Value: 0</div>
 
         <!-- Control Buttons -->
         <div class="controls-row">
             <button class="sim-btn secondary" onclick="stepCounter(-1)">- Down</button>
             <button class="sim-btn" onclick="stepCounter(1)">+ Up</button>
-            <button class="sim-btn secondary" id="autoBtn" onclick="toggleAutoPlay()">Auto Play</button>
+            <button class="sim-btn secondary" id="autoBtn" onclick="toggleAutoPlay()">Auto Count</button>
             <button class="sim-btn secondary" onclick="resetCounter()">Reset</button>
         </div>
     </div>
@@ -178,42 +219,53 @@
 <script>
     let counterValue = 0;
     let autoInterval = null;
-    let autoDirection = 1; // 1 for up, -1 for down
+    let autoDirection = 1;
 
     function updateDisplay(oldValue, newValue) {
-        // Keep within 4-bit bounds (0 to 15) with wrap-around
-        counterValue = (newValue + 16) % 16;
-        let oldValMasked = (oldValue + 16) % 16;
+        // Keep within 8-bit bounds (0 to 255) with wrap-around
+        counterValue = (newValue + 256) % 256;
+        let oldValMasked = (oldValue + 256) % 256;
 
-        const oldBinary = oldValMasked.toString(2).padStart(4, '0');
-        const newBinary = counterValue.toString(2).padStart(4, '0');
+        const oldBinary = oldValMasked.toString(2).padStart(8, '0');
+        const newBinary = counterValue.toString(2).padStart(8, '0');
 
-        for (let i = 0; i < 4; i++) {
-            const bitIndex = 3 - i; // maps to bits 3 down to 0
+        for (let i = 0; i < 8; i++) {
+            const bitIndex = 7 - i; // maps loop index to bits 7 down to 0
             const bitVal = newBinary[i];
             const bulb = document.getElementById(`bit${bitIndex}`);
             const valSpan = document.getElementById(`val${bitIndex}`);
+            const arrow = document.getElementById(`arrow${bitIndex}`);
 
             valSpan.textContent = bitVal;
 
-            // Turn on/off lit class
             if (bitVal === '1') {
                 bulb.classList.add('lit');
             } else {
                 bulb.classList.remove('lit');
             }
 
-            // If this specific bit changed state, trigger the animation effect
+            // Check if bit changed state to trigger animation and directional arrow
             if (oldBinary[i] !== newBinary[i]) {
                 bulb.classList.remove('flipped');
-                void bulb.offsetWidth; // Force reflow to restart animation
+                void bulb.offsetWidth; // Force reflow
                 bulb.classList.add('flipped');
+
+                // Set arrow direction (Up if turned to 1, Down if turned to 0)
+                if (bitVal === '1') {
+                    arrow.textContent = '▲';
+                    arrow.className = 'shift-arrow up';
+                } else {
+                    arrow.textContent = '▼';
+                    arrow.className = 'shift-arrow down';
+                }
+            } else {
+                // Clear arrow if bit didn't change this step
+                arrow.className = 'shift-arrow';
             }
         }
 
-        // Update decimal and hex text
-        document.getElementById('decimalOutput').textContent = 
-            `Decimal Value: ${counterValue} (0x${counterValue.toString(16).toUpperCase()})`;
+        // Update big decimal display
+        document.getElementById('decimalOutput').textContent = counterValue;
     }
 
     function stepCounter(direction) {
@@ -226,7 +278,7 @@
         if (autoInterval) {
             clearInterval(autoInterval);
             autoInterval = null;
-            document.getElementById('autoBtn').textContent = 'Auto Play';
+            document.getElementById('autoBtn').textContent = 'Auto Count';
             document.getElementById('autoBtn').style.background = '#64748b';
         }
         updateDisplay(prev, 0);
@@ -237,17 +289,16 @@
         if (autoInterval) {
             clearInterval(autoInterval);
             autoInterval = null;
-            btn.textContent = 'Auto Play';
+            btn.textContent = 'Auto Count';
             btn.style.background = '#64748b';
         } else {
             autoInterval = setInterval(() => {
-                // If it hits max or min during auto play, reverse direction for a neat back-and-forth effect
-                if (counterValue === 15) autoDirection = -1;
+                if (counterValue === 255) autoDirection = -1;
                 if (counterValue === 0) autoDirection = 1;
 
                 let prev = counterValue;
                 updateDisplay(prev, counterValue + autoDirection);
-            }, 700);
+            }, 300);
             btn.textContent = 'Stop Auto';
             btn.style.background = '#ef4444';
         }
