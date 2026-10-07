@@ -172,28 +172,42 @@
             box-sizing: border-box;
         }
         .math-dropdown.open {
-            max-height: 150px;
+            max-height: 250px;
             padding: 15px;
             border-color: #e2e8f0;
         }
         .math-content {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             font-size: 0.85rem;
             color: #334155;
-            text-align: center;
         }
         .math-equation {
             font-family: monospace;
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-size: 0.9rem;
             background: #fff;
-            padding: 10px;
+            padding: 8px;
             border-radius: 6px;
             border: 1px solid #cbd5e1;
-            color: #1e293b;
+            text-align: center;
             word-break: break-all;
+        }
+        .math-breakdown-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            font-size: 0.75rem;
+        }
+        .math-item {
+            background: #fff;
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
         }
 
         /* Controls Area */
@@ -285,8 +299,12 @@
         <!-- MATH EXPLANATION DROPDOWN (Directly Below) -->
         <div class="math-dropdown" id="mathDropdown">
             <div class="math-content">
-                <span style="color: #64748b; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Active Place-Value Addition</span>
+                <strong>Binary Calculation Breakdown:</strong>
+                <p style="margin: 0; color: #64748b; font-size: 0.8rem;">Sum of active place values ($128$ down to $1$):</p>
                 <div class="math-equation" id="mathEquation">0 = 0</div>
+                <ul class="math-breakdown-list" id="mathList">
+                    <!-- Populated dynamically -->
+                </ul>
             </div>
         </div>
 
@@ -383,18 +401,24 @@
         const binaryString = counterValue.toString(2).padStart(8, '0');
         
         let activeTerms = [];
+        let listHtml = '';
 
         for (let i = 0; i < 8; i++) {
             let bitVal = parseInt(binaryString[i]);
             let weight = powers[i];
+            let product = bitVal * weight;
 
             if (bitVal === 1) {
                 activeTerms.push(`${weight}`);
             }
+
+            listHtml += `<li class="math-item"><b>${weight}</b>×${bitVal}=${product}</li>`;
         }
 
         let equationString = activeTerms.length > 0 ? activeTerms.join(' + ') + ` = ${counterValue}` : `0 = 0`;
+        
         document.getElementById('mathEquation').textContent = equationString;
+        document.getElementById('mathList').innerHTML = listHtml;
     }
 
     function stepCounter(direction) {
