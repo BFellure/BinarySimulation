@@ -80,10 +80,10 @@
         }
 
         .traveling-arrow.animate-right-left {
-            animation: sweepRightToLeft 0.3s ease-out forwards;
+            animation: sweepRightToLeft 0.5s ease-out forwards;
         }
         .traveling-arrow.animate-left-right {
-            animation: sweepLeftToRight 0.3s ease-out forwards;
+            animation: sweepLeftToRight 0.5s ease-out forwards;
         }
 
         /* 8-Bit Bulbs Container */
@@ -127,7 +127,7 @@
             100% { transform: scale(1); filter: brightness(1); }
         }
         .bulb-glass.flipped {
-            animation: bitPulse 0.3s ease-in-out;
+            animation: bitPulse 0.4s ease-in-out;
         }
 
         .binary-digit {
@@ -316,7 +316,7 @@
 
                 let prev = counterValue;
                 updateDisplay(prev, counterValue + autoDirection, autoDirection);
-            }, 350);
+            }, 900); // Slower interval (900ms per count step)
             btn.textContent = 'Stop Auto';
             btn.style.background = '#ef4444';
         }
