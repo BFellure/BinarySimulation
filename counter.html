@@ -385,4 +385,81 @@
             let targetArrow = document.getElementById(`gap${highestChangedBit}_${highestChangedBit - 1}`);
             if (targetArrow) {
                 targetArrow.textContent = direction > 0 ? '◀' : '▶';
-                target
+                targetArrow.classList.add('active');
+            }
+        }
+
+        document.getElementById('decimalOutput').textContent = counterValue;
+
+        if (isMathOpen) {
+            updateMathExplanation();
+        }
+    }
+
+    function updateMathExplanation() {
+        const powers = [128, 64, 32, 16, 8, 4, 2, 1];
+        const binaryString = counterValue.toString(2).padStart(8, '0');
+        
+        let activeTerms = [];
+        let listHtml = '';
+
+        for (let i = 0; i < 8; i++) {
+            let bitVal = parseInt(binaryString[i]);
+            let weight = powers[i];
+            let product = bitVal * weight;
+
+            if (bitVal === 1) {
+                activeTerms.push(`${weight}`);
+            }
+
+            listHtml += `<li class="math-item"><b>${weight}</b>×${bitVal}=${product}</li>`;
+        }
+
+        let equationString = activeTerms.length > 0 ? activeTerms.join(' + ') + ` = ${counterValue}` : `0 = 0`;
+        
+        document.getElementById('mathEquation').textContent = equationString;
+        document.getElementById('mathList').innerHTML = listHtml;
+    }
+
+    function stepCounter(direction) {
+        let prev = counterValue;
+        updateDisplay(prev, counterValue + direction, direction);
+    }
+
+    function resetCounter() {
+        let prev = counterValue;
+        if (autoInterval) {
+            clearInterval(autoInterval);
+            autoInterval = null;
+            document.getElementById('autoBtn').textContent = 'Auto Count';
+            document.getElementById('autoBtn').style.background = '#64748b';
+        }
+        updateDisplay(prev, 0, 1);
+    }
+
+    function toggleAutoPlay() {
+        const btn = document.getElementById('autoBtn');
+        if (autoInterval) {
+            clearInterval(autoInterval);
+            autoInterval = null;
+            btn.textContent = 'Auto Count';
+            btn.style.background = '#64748b';
+        } else {
+            autoInterval = setInterval(() => {
+                if (counterValue === 255) autoDirection = -1;
+                if (counterValue === 0) autoDirection = 1;
+
+                let prev = counterValue;
+                updateDisplay(prev, counterValue + autoDirection, autoDirection);
+            }, 900);
+            btn.textContent = 'Stop Auto';
+            btn.style.background = '#ef4444';
+        }
+    }
+
+    // Initialize display
+    updateDisplay(0, 0, 1);
+</script>
+
+</body>
+</html>
