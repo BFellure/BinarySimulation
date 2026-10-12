@@ -90,6 +90,28 @@
             background: #fff;
         }
 
+        /* Small Dual Box Row for Question 1 */
+        .dual-box-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .small-input {
+            width: 50px;
+            height: 45px;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 700;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+            background: #f8fafc;
+        }
+        .small-input:focus {
+            border-color: #3b82f6;
+            background: #fff;
+        }
+
         /* 6-Box Place Value Row */
         .place-value-row {
             display: flex;
@@ -178,25 +200,27 @@
 
         <!-- Question 1 -->
         <div class="question-block" id="q1-block">
-            <div class="question-text">1. What are the two symbols represented in binary numbers? (Format: symbol & symbol)</div>
-            <div class="input-row">
-                <input type="text" class="quiz-input" id="ans1" placeholder="e.g. 1 & 0">
+            <div class="question-text">What are the two symbols represented in binary numbers:</div>
+            <div class="dual-box-row">
+                <input type="text" class="small-input" id="ans1_a" maxlength="2">
+                <span style="font-weight: 700; color: #64748b;">&</span>
+                <input type="text" class="small-input" id="ans1_b" maxlength="2">
             </div>
             <div class="feedback hidden" id="feed1"></div>
         </div>
 
         <!-- Question 2 -->
         <div class="question-block" id="q2-block">
-            <div class="question-text">2. What are the tiny electronic switches that turn on or off to represent 1s and 0s?</div>
+            <div class="question-text">What are the tiny electronic switches that turn on or off to represent the 1s and 0s that computers use to store and process information?:</div>
             <div class="input-row">
-                <input type="text" class="quiz-input" id="ans2" placeholder="Enter component name">
+                <input type="text" class="quiz-input" id="ans2" placeholder="Enter answer">
             </div>
             <div class="feedback hidden" id="feed2"></div>
         </div>
 
         <!-- Question 3 -->
         <div class="question-block" id="q3-block">
-            <div class="question-text">3. Write the value of each place in a 6-bit binary number system in order:</div>
+            <div class="question-text">Write the value of each place in the binary number system in the boxes below, following the correct pattern.</div>
             <div class="place-value-row">
                 <input type="text" class="pv-input" id="pv5" maxlength="3">
                 <input type="text" class="pv-input" id="pv4" maxlength="3">
@@ -210,9 +234,9 @@
 
         <!-- Question 4 -->
         <div class="question-block" id="q4-block">
-            <div class="question-text">4. What is the standard system that turns binary numbers into alphabetical characters?</div>
+            <div class="question-text">What is the standard system that turns binary numbers into alphabetical characters?:</div>
             <div class="input-row">
-                <input type="text" class="quiz-input" id="ans4" placeholder="Enter standard name or acronym">
+                <input type="text" class="quiz-input" id="ans4" placeholder="Enter answer">
             </div>
             <div class="feedback hidden" id="feed4"></div>
         </div>
@@ -233,27 +257,25 @@
         let score = 0;
         let total = 4;
 
-        // Question 1: Check if input contains both '1' and '0'
-        let raw1 = document.getElementById('ans1').value.trim().toLowerCase();
+        // Question 1: Two boxes must be '1' and '0' (or '0' and '1'), and not repeated
+        let boxA = document.getElementById('ans1_a').value.trim();
+        let boxB = document.getElementById('ans1_b').value.trim();
         let feed1 = document.getElementById('feed1');
-        let isQ1Correct = (raw1.includes('1') && raw1.includes('0')) && (raw1.includes('&') || raw1.includes('and') || raw1.includes(',') || raw1.includes('or'));
         
-        // Fallback simple check if they just wrote "1, 0" or "1 and 0"
-        if (raw1 === '1,0' || raw1 === '1 and 0' || raw1 === '1 & 0' || raw1 === '0 & 1' || raw1 === '0, 1' || raw1 === '1, 0') {
-            isQ1Correct = true;
-        }
+        let isValidPair = (boxA !== boxB) && 
+                          ((boxA === '1' && boxB === '0') || (boxA === '0' && boxB === '1'));
 
-        if (isQ1Correct) {
+        if (isValidPair) {
             feed1.textContent = "✔ Correct!";
             feed1.className = "feedback correct";
             score++;
         } else {
-            feed1.textContent = "✘ Incorrect (Answer: 1, 0)";
+            feed1.textContent = "✘ Incorrect (Answers must be 1 and 0 in separate boxes without repeating)";
             feed1.className = "feedback incorrect";
         }
         feed1.classList.remove('hidden');
 
-        // Question 2: Transistor / Microtransistor
+        // Question 2: Transistors or Microtransistors
         let raw2 = document.getElementById('ans2').value.trim().toLowerCase();
         let feed2 = document.getElementById('feed2');
         if (raw2.includes('transistor') || raw2.includes('microtransistor')) {
@@ -261,7 +283,7 @@
             feed2.className = "feedback correct";
             score++;
         } else {
-            feed2.textContent = "✘ Incorrect (Answer: Transistors)";
+            feed2.textContent = "✘ Incorrect";
             feed2.className = "feedback incorrect";
         }
         feed2.classList.remove('hidden');
@@ -285,7 +307,7 @@
         }
         feed3.classList.remove('hidden');
 
-        // Question 4: ASCII / American Standard Code for Information Interchange
+        // Question 4: ASCII / American Standard Code Information Interchange
         let raw4 = document.getElementById('ans4').value.trim().toLowerCase();
         let feed4 = document.getElementById('feed4');
         if (raw4.includes('ascii') || raw4.includes('american standard code')) {
@@ -293,7 +315,7 @@
             feed4.className = "feedback correct";
             score++;
         } else {
-            feed4.textContent = "✘ Incorrect (Answer: ASCII)";
+            feed4.textContent = "✘ Incorrect";
             feed4.className = "feedback incorrect";
         }
         feed4.classList.remove('hidden');
@@ -305,7 +327,8 @@
     }
 
     function resetQuiz() {
-        document.getElementById('ans1').value = '';
+        document.getElementById('ans1_a').value = '';
+        document.getElementById('ans1_b').value = '';
         document.getElementById('ans2').value = '';
         document.getElementById('ans4').value = '';
         
