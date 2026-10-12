@@ -14,21 +14,35 @@
             align-items: center;
             min-height: 100vh;
             background: transparent;
-            overflow: hidden;
+            overflow-x: hidden;
             font-family: system-ui, -apple-system, sans-serif;
         }
         .main-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
+            padding: 20px;
+        }
+        .interactive-stage-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 25px 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            position: relative;
+            box-sizing: border-box;
         }
         .interactive-stage {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 40px;
-            padding: 20px;
+            padding: 10px 0;
         }
         .section-box {
             display: flex;
@@ -48,10 +62,10 @@
             justify-content: center;
             align-items: center;
             gap: 30px;
-            background: rgba(255, 255, 255, 0.85);
+            background: #ffffff;
             padding: 20px 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
             border: 1px solid #e2e8f0;
         }
         /* Physical Switch Styling */
@@ -234,68 +248,120 @@
             margin-top: 10px;
         }
 
-        /* Audio Note & Signature */
+        /* Audio Note */
         .audio-note {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: #64748b;
             font-style: italic;
             text-align: center;
         }
-        .signature {
+
+        /* Utility */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Disclaimer Section */
+        .disclaimer-container {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 15px;
+            margin-top: 5px;
+            text-align: center;
+            width: 100%;
+        }
+        .disclaimer-toggle {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+            transition: color 0.2s;
+        }
+        .disclaimer-toggle:hover {
+            color: #3b82f6;
+        }
+        .disclaimer-content {
             font-size: 0.75rem;
             color: #64748b;
-            font-weight: 500;
-            letter-spacing: 0.03em;
+            background: #f8fafc;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            margin-top: 10px;
+            text-align: left;
+            line-height: 1.4;
+        }
+        .disclaimer-content a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .disclaimer-content a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
 <div class="main-container">
-    <div class="interactive-stage">
-        <!-- Digital Section -->
-        <div class="section-box">
-            <span class="section-label">Digital (Binary)</span>
-            <div class="device-panel">
-                <div class="switch-plate off" id="lightSwitch" onclick="toggleSwitch()">
-                    <div class="switch-toggle"></div>
-                </div>
-                <div class="bulb-box">
-                    <div class="bulb-glass">
-                        <span class="binary-display" id="digitDisplay">0</span>
+    <div class="interactive-stage-card">
+        <div class="interactive-stage">
+            <!-- Digital Section -->
+            <div class="section-box">
+                <span class="section-label">Digital (Binary)</span>
+                <div class="device-panel">
+                    <div class="switch-plate off" id="lightSwitch" onclick="toggleSwitch()">
+                        <div class="switch-toggle"></div>
                     </div>
-                    <div class="bulb-base"></div>
-                    <div class="bulb-contact"></div>
+                    <div class="bulb-box">
+                        <div class="bulb-glass">
+                            <span class="binary-display" id="digitDisplay">0</span>
+                        </div>
+                        <div class="bulb-base"></div>
+                        <div class="bulb-contact"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analog Section with Dial and Audio -->
+            <div class="section-box">
+                <span class="section-label">Analog</span>
+                <div class="device-panel">
+                    <div class="analog-controls">
+                        <!-- Rotary Dial Knob -->
+                        <div class="knob-container" id="analogKnob" title="Click and drag in a circle to turn">
+                            <div class="knob-indicator" id="knobIndicator"></div>
+                        </div>
+                        <button class="mute-btn muted" id="muteBtn" onclick="toggleMute()">Unmute Audio</button>
+                    </div>
+                    
+                    <!-- Analog Dial Gauge Display -->
+                    <div class="gauge-box">
+                        <div class="gauge-face">
+                            <div class="gauge-needle" id="gaugeNeedle"></div>
+                            <div class="gauge-pin"></div>
+                        </div>
+                        <span class="gauge-label" id="analogDigit">100 Hz</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Analog Section with Dial and Audio -->
-        <div class="section-box">
-            <span class="section-label">Analog</span>
-            <div class="device-panel">
-                <div class="analog-controls">
-                    <!-- Rotary Dial Knob -->
-                    <div class="knob-container" id="analogKnob" title="Click and drag in a circle to turn">
-                        <div class="knob-indicator" id="knobIndicator"></div>
-                    </div>
-                    <button class="mute-btn muted" id="muteBtn" onclick="toggleMute()">Unmute Audio</button>
-                </div>
-                
-                <!-- Analog Dial Gauge Display -->
-                <div class="gauge-box">
-                    <div class="gauge-face">
-                        <div class="gauge-needle" id="gaugeNeedle"></div>
-                        <div class="gauge-pin"></div>
-                    </div>
-                    <span class="gauge-label" id="analogDigit">100 Hz</span>
-                </div>
+        <!-- Note -->
+        <div class="audio-note">Note: Turn volume up and click 'Unmute Audio' to hear the analog continuous tone.</div>
+
+        <!-- Footer Disclaimer Dropdown -->
+        <div class="disclaimer-container">
+            <button class="disclaimer-toggle" onclick="toggleDisclaimer()">Disclaimer</button>
+            <div class="disclaimer-content hidden" id="disclaimerBox">
+                <strong>Development & AI Disclaimer:</strong><br>
+                Purely the interactive components, such as quizzes and simulators, were generated using Google Gemini large language models with direct human oversight, design direction, and code validation by Bodin Fellure.<br><br>
+                Source code can be found at: <a href="https://github.com/BFellure/BinarySimulation/tree/main" target="_blank">https://github.com/BFellure/BinarySimulation/tree/main</a>
             </div>
         </div>
     </div>
-
-    <!-- Note & Signature -->
-    <div class="audio-note">Note: Turn volume up and click 'Unmute Audio' to hear the analog continuous tone.</div>
 </div>
 
 <script>
@@ -312,6 +378,15 @@
             sw.classList.remove('on');
             sw.classList.add('off');
             digit.textContent = '0';
+        }
+    }
+
+    function toggleDisclaimer() {
+        let box = document.getElementById('disclaimerBox');
+        if (box.classList.contains('hidden')) {
+            box.classList.remove('hidden');
+        } else {
+            box.classList.add('hidden');
         }
     }
 
@@ -407,7 +482,6 @@
         let degrees = radians * (180 / Math.PI);
 
         // Normalize degrees to range from -180 to 180, mapping the bottom gap nicely
-        // We'll map a 270-degree sweep starting from bottom-left (-135°) to bottom-right (+135°)
         degrees += 90; 
         if (degrees < -180) degrees += 360;
         if (degrees > 180) degrees -= 360;
