@@ -250,13 +250,6 @@
             text-align: left;
             line-height: 1.4;
         }
-        .disclaimer-content a {
-            color: #3b82f6;
-            text-decoration: none;
-        }
-        .disclaimer-content a:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
@@ -291,4 +284,166 @@
             <!-- Scaled Decimal Example Boxes in Distinct Color -->
             <div class="example-row hidden" id="exampleBox">
                 <div class="example-box">100000</div>
-                <div class="example-box">10
+                <div class="example-box">10000</div>
+                <div class="example-box">1000</div>
+                <div class="example-box">100</div>
+                <div class="example-box">10</div>
+                <div class="example-box">1</div>
+            </div>
+
+            <div class="place-value-row">
+                <input type="text" class="pv-input" id="pv5" maxlength="3">
+                <input type="text" class="pv-input" id="pv4" maxlength="3">
+                <input type="text" class="pv-input" id="pv3" maxlength="3">
+                <input type="text" class="pv-input" id="pv2" maxlength="3">
+                <input type="text" class="pv-input" id="pv1" maxlength="3">
+                <input type="text" class="pv-input" id="pv0" maxlength="3">
+            </div>
+            <div class="feedback hidden" id="feed3"></div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="question-block" id="q4-block">
+            <div class="question-text">What is the standard system that turns binary numbers into alphabetical characters?:</div>
+            <div class="input-row">
+                <input type="text" class="quiz-input" id="ans4" placeholder="Enter answer">
+            </div>
+            <div class="feedback hidden" id="feed4"></div>
+        </div>
+
+        <!-- Score Banner -->
+        <div class="score-display hidden" id="scoreBanner"></div>
+
+        <!-- Control Buttons -->
+        <div class="controls-row">
+            <button class="sim-btn" onclick="gradeQuiz()">Submit Answers</button>
+            <button class="sim-btn secondary" onclick="resetQuiz()">Reset Quiz</button>
+        </div>
+
+        <!-- Footer Disclaimer Dropdown -->
+        <div class="disclaimer-container">
+            <button class="disclaimer-toggle" onclick="toggleDisclaimer()">Disclaimer</button>
+            <div class="disclaimer-content hidden" id="disclaimerBox">
+                <strong>Development & AI Disclaimer:</strong><br>
+                This web application's HTML5, CSS3, and JavaScript code was generated using Google Gemini large language models. Direct human oversight, specification design, question formulation, layout direction, and code validation were conducted by Bodin Fellure.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleExample() {
+        let box = document.getElementById('exampleBox');
+        let btn = document.getElementById('exampleBtn');
+        if (box.classList.contains('hidden')) {
+            box.classList.remove('hidden');
+            btn.textContent = 'Hide Example';
+        } else {
+            box.classList.add('hidden');
+            btn.textContent = 'View Example in Decimal';
+        }
+    }
+
+    function toggleDisclaimer() {
+        let box = document.getElementById('disclaimerBox');
+        if (box.classList.contains('hidden')) {
+            box.classList.remove('hidden');
+        } else {
+            box.classList.add('hidden');
+        }
+    }
+
+    function gradeQuiz() {
+        let score = 0;
+        let total = 4;
+
+        // Question 1
+        let boxA = document.getElementById('ans1_a').value.trim();
+        let boxB = document.getElementById('ans1_b').value.trim();
+        let feed1 = document.getElementById('feed1');
+        
+        let isValidPair = (boxA !== boxB) && 
+                          ((boxA === '1' && boxB === '0') || (boxA === '0' && boxB === '1'));
+
+        if (isValidPair) {
+            feed1.textContent = "✔ Correct!";
+            feed1.className = "feedback correct";
+            score++;
+        } else {
+            feed1.textContent = "✘ Incorrect";
+            feed1.className = "feedback incorrect";
+        }
+        feed1.classList.remove('hidden');
+
+        // Question 2
+        let raw2 = document.getElementById('ans2').value.trim().toLowerCase();
+        let feed2 = document.getElementById('feed2');
+        if (raw2.includes('transistor') || raw2.includes('microtransistor')) {
+            feed2.textContent = "✔ Correct!";
+            feed2.className = "feedback correct";
+            score++;
+        } else {
+            feed2.textContent = "✘ Incorrect";
+            feed2.className = "feedback incorrect";
+        }
+        feed2.classList.remove('hidden');
+
+        // Question 3
+        let pv5 = document.getElementById('pv5').value.trim();
+        let pv4 = document.getElementById('pv4').value.trim();
+        let pv3 = document.getElementById('pv3').value.trim();
+        let pv2 = document.getElementById('pv2').value.trim();
+        let pv1 = document.getElementById('pv1').value.trim();
+        let pv0 = document.getElementById('pv0').value.trim();
+        let feed3 = document.getElementById('feed3');
+
+        if (pv5 === '32' && pv4 === '16' && pv3 === '8' && pv2 === '4' && pv1 === '2' && pv0 === '1') {
+            feed3.textContent = "✔ Correct!";
+            feed3.className = "feedback correct";
+            score++;
+        } else {
+            feed3.textContent = "✘ Incorrect";
+            feed3.className = "feedback incorrect";
+        }
+        feed3.classList.remove('hidden');
+
+        // Question 4
+        let raw4 = document.getElementById('ans4').value.trim().toLowerCase();
+        let feed4 = document.getElementById('feed4');
+        if (raw4.includes('ascii') || raw4.includes('american standard code')) {
+            feed4.textContent = "✔ Correct!";
+            feed4.className = "feedback correct";
+            score++;
+        } else {
+            feed4.textContent = "✘ Incorrect";
+            feed4.className = "feedback incorrect";
+        }
+        feed4.classList.remove('hidden');
+
+        // Show Final Score
+        let scoreBanner = document.getElementById('scoreBanner');
+        scoreBanner.textContent = `Total Score: ${score} / ${total}`;
+        scoreBanner.classList.remove('hidden');
+    }
+
+    function resetQuiz() {
+        document.getElementById('ans1_a').value = '';
+        document.getElementById('ans1_b').value = '';
+        document.getElementById('ans2').value = '';
+        document.getElementById('ans4').value = '';
+        
+        ['5', '4', '3', '2', '1', '0'].forEach(i => {
+            document.getElementById(`pv${i}`).value = '';
+        });
+
+        for (let i = 1; i <= 4; i++) {
+            let feed = document.getElementById(`feed${i}`);
+            feed.classList.add('hidden');
+        }
+
+        document.getElementById('scoreBanner').classList.add('hidden');
+    }
+</script>
+
+</body>
+</html>
