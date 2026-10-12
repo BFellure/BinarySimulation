@@ -15,7 +15,7 @@
             min-height: 100vh;
             background: transparent; /* Transparent for Google Sites embedding */
             font-family: 'Courier New', Courier, monospace;
-            color: #38bdf8;
+            color: #e2e8f0;
         }
         .main-container {
             display: flex;
@@ -28,29 +28,29 @@
             box-sizing: border-box;
         }
 
-        /* Sci-Fi CRT Monitor Frame */
+        /* Sci-Fi CRT Monitor Frame (Bright & Readable) */
         .terminal-card {
-            background: #030712;
-            border: 2px solid #0284c7;
+            background: #0f172a;
+            border: 2px solid #0ea5e9;
             border-radius: 12px;
-            box-shadow: 0 0 25px rgba(2, 132, 199, 0.35), inset 0 0 15px rgba(2, 132, 199, 0.15);
+            box-shadow: 0 0 25px rgba(14, 165, 233, 0.25), inset 0 0 15px rgba(14, 165, 233, 0.1);
             padding: 25px;
             width: 100%;
             box-sizing: border-box;
             position: relative;
         }
 
-        /* CRT Scanline Overlay Effect */
+        /* CRT Scanline Overlay Effect (Subtle) */
         .terminal-card::before {
             content: " ";
             display: block;
             position: absolute;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
             background-size: 100% 4px;
             z-index: 2;
             pointer-events: none;
-            opacity: 0.6;
+            opacity: 0.4;
         }
 
         /* Header / Alarm Status Bar */
@@ -58,7 +58,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #1e293b;
+            border-bottom: 1px solid #334155;
             padding-bottom: 12px;
             margin-bottom: 15px;
             position: relative;
@@ -72,7 +72,7 @@
             text-transform: uppercase;
         }
         .alarm-badge {
-            background: rgba(239, 68, 68, 0.15);
+            background: rgba(239, 68, 68, 0.2);
             border: 1px solid #ef4444;
             color: #f87171;
             padding: 4px 10px;
@@ -83,7 +83,7 @@
             animation: alarmPulse 1.2s infinite alternate;
         }
         @keyframes alarmPulse {
-            0% { opacity: 0.4; box-shadow: 0 0 2px #ef4444; }
+            0% { opacity: 0.6; box-shadow: 0 0 2px #ef4444; }
             100% { opacity: 1; box-shadow: 0 0 10px #ef4444; }
         }
 
@@ -92,8 +92,8 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid #1e293b;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #334155;
             padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -104,16 +104,16 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            border: 1px solid #0284c7;
+            border: 1px solid #0ea5e9;
             position: relative;
-            background: radial-gradient(circle, rgba(2,132,199,0.2) 0%, rgba(3,7,18,0.9) 70%);
+            background: radial-gradient(circle, rgba(14,165,233,0.3) 0%, rgba(15,23,42,0.9) 70%);
             flex-shrink: 0;
         }
         .radar-sweep {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             border-radius: 50%;
-            background: conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(56, 189, 248, 0.6) 360deg);
+            background: conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(56, 189, 248, 0.7) 360deg);
             animation: radarRotate 2.5s linear infinite;
         }
         @keyframes radarRotate {
@@ -121,8 +121,8 @@
             to { transform: rotate(360deg); }
         }
         .briefing-text {
-            font-size: 0.8rem;
-            color: #94a3b8;
+            font-size: 0.85rem;
+            color: #cbd5e1;
             line-height: 1.4;
         }
 
@@ -141,64 +141,66 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid #334155;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid #475569;
             border-radius: 6px;
             padding: 6px 2px;
             transition: all 0.2s ease;
         }
         .box-unit:hover {
-            border-color: #0284c7;
-            box-shadow: 0 0 8px rgba(2, 132, 199, 0.4);
+            border-color: #0ea5e9;
+            box-shadow: 0 0 8px rgba(14, 165, 233, 0.4);
         }
         .box-tag {
             font-size: 0.6rem;
-            color: #64748b;
+            color: #94a3b8;
             font-weight: 700;
             margin-bottom: 4px;
         }
         .terminal-input {
             width: 92%;
-            background: #020617;
-            border: 1px solid #1e293b;
-            color: #38bdf8;
+            background: #1e293b;
+            border: 1px solid #475569;
+            color: #ffffff;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 0.75rem;
-            font-weight: 700;
+            font-size: 0.9rem;
+            font-weight: 800;
             text-align: center;
-            padding: 5px 0;
+            padding: 6px 0;
             border-radius: 4px;
             outline: none;
+            text-transform: uppercase;
             box-sizing: border-box;
         }
         .terminal-input:focus {
             border-color: #38bdf8;
-            box-shadow: 0 0 6px #0284c7;
+            box-shadow: 0 0 6px #0ea5e9;
+            background: #0f172a;
         }
-        .char-screen {
+        .status-light {
             margin-top: 6px;
             width: 24px;
             height: 24px;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #020617;
-            border: 1px solid #1e293b;
+            background: #1e293b;
+            border: 1px solid #475569;
             border-radius: 4px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 800;
-            color: #475569;
+            color: #64748b;
         }
-        .char-screen.active {
-            color: #22c55e;
+        .status-light.active {
+            color: #4ade80;
             border-color: #22c55e;
             box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
-            background: rgba(34, 197, 94, 0.1);
+            background: rgba(34, 197, 94, 0.15);
         }
 
         /* Success Override Alert */
         .success-terminal {
-            background: rgba(34, 197, 94, 0.1);
+            background: rgba(34, 197, 94, 0.15);
             border: 2px solid #22c55e;
             border-radius: 8px;
             padding: 15px;
@@ -220,7 +222,7 @@
             letter-spacing: 0.1em;
         }
         .final-code-text {
-            color: #22c55e;
+            color: #4ade80;
             font-size: 1.5rem;
             font-weight: 900;
             letter-spacing: 0.25em;
@@ -281,7 +283,7 @@
 
         /* Footer Disclaimer Dropdown */
         .disclaimer-container {
-            border-top: 1px solid #1e293b;
+            border-top: 1px solid #334155;
             padding-top: 12px;
             margin-top: 10px;
             text-align: center;
@@ -291,7 +293,7 @@
         .disclaimer-toggle {
             background: none;
             border: none;
-            color: #64748b;
+            color: #94a3b8;
             font-size: 0.7rem;
             font-family: inherit;
             font-weight: 600;
@@ -305,11 +307,11 @@
         }
         .disclaimer-content {
             font-size: 0.7rem;
-            color: #94a3b8;
-            background: #020617;
+            color: #cbd5e1;
+            background: #1e293b;
             padding: 10px;
             border-radius: 6px;
-            border: 1px solid #1e293b;
+            border: 1px solid #334155;
             margin-top: 8px;
             text-align: left;
             line-height: 1.4;
@@ -339,7 +341,7 @@
                 <div class="radar-sweep"></div>
             </div>
             <div class="briefing-text">
-                <strong>MISSION DIRECTIVE:</strong> Input valid binary values into sequential slots #1 through #13 to override the communications relay and decode the distress frequency.
+                <strong>MISSION DIRECTIVE:</strong> Enter your decoded letters into sequential slots #1 through #13 to override the communications relay and broadcast the secret distress message.
             </div>
         </div>
 
@@ -376,21 +378,21 @@
 </div>
 
 <script>
-    // 13 Decimal answers mapping sequentially to spell B-I-T-S-A-N-D-P-I-E-C-E-S
+    // 13 Correct letters spelling B-I-T-S-A-N-D-P-I-E-C-E-S (case-insensitive checking)
     const terminalKey = [
-        { slot: 1, expectedDec: 2, char: 'B' },
-        { slot: 2, expectedDec: 9, char: 'I' },
-        { slot: 3, expectedDec: 20, char: 'T' },
-        { slot: 4, expectedDec: 19, char: 'S' },
-        { slot: 5, expectedDec: 1, char: 'A' },
-        { slot: 6, expectedDec: 14, char: 'N' },
-        { slot: 7, expectedDec: 4, char: 'D' },
-        { slot: 8, expectedDec: 16, char: 'P' },
-        { slot: 9, expectedDec: 9, char: 'I' },
-        { slot: 10, expectedDec: 5, char: 'E' },
-        { slot: 11, expectedDec: 3, char: 'C' },
-        { slot: 12, expectedDec: 5, char: 'E' },
-        { slot: 13, expectedDec: 19, char: 'S' }
+        { slot: 1, char: 'B' },
+        { slot: 2, char: 'I' },
+        { slot: 3, char: 'T' },
+        { slot: 4, char: 'S' },
+        { slot: 5, char: 'A' },
+        { slot: 6, char: 'N' },
+        { slot: 7, char: 'D' },
+        { slot: 8, char: 'P' },
+        { slot: 9, char: 'I' },
+        { slot: 10, char: 'E' },
+        { slot: 11, char: 'C' },
+        { slot: 12, char: 'E' },
+        { slot: 13, char: 'S' }
     ];
 
     function initTerminalRow() {
@@ -402,8 +404,8 @@
             unit.className = 'box-unit';
             unit.innerHTML = `
                 <span class="box-tag">#${item.slot}</span>
-                <input type="text" class="terminal-input" id="in_${item.slot}" placeholder="01" autocomplete="off">
-                <div class="char-screen" id="char_${item.slot}">?</div>
+                <input type="text" class="terminal-input" id="in_${item.slot}" maxlength="1" placeholder="-" autocomplete="off">
+                <div class="status-light" id="light_${item.slot}">✓</div>
             `;
             row.appendChild(unit);
         });
@@ -418,28 +420,18 @@
         }
     }
 
-    // Binary validation function supporting unlimited leading zeros
-    function checkBinary(inputVal, expectedDecimal) {
-        let trimmed = inputVal.trim();
-        if (trimmed === '' || trimmed === '0') return expectedDecimal === 0;
-        if (!/^[01]+$/.test(trimmed)) return false;
-        return parseInt(trimmed, 2) === expectedDecimal;
-    }
-
     function verifyTerminal() {
         let unlockedCount = 0;
 
         terminalKey.forEach(item => {
-            const inputVal = document.getElementById(`in_${item.slot}`).value;
-            const charScreen = document.getElementById(`char_${item.slot}`);
+            const inputVal = document.getElementById(`in_${item.slot}`).value.trim().toUpperCase();
+            const light = document.getElementById(`light_${item.slot}`);
 
-            if (checkBinary(inputVal, item.expectedDec)) {
+            if (inputVal === item.char) {
                 unlockedCount++;
-                charScreen.textContent = item.char;
-                charScreen.classList.add('active');
+                light.classList.add('active');
             } else {
-                charScreen.textContent = '?';
-                charScreen.classList.remove('active');
+                light.classList.remove('active');
             }
         });
 
@@ -458,9 +450,8 @@
     function resetTerminal() {
         terminalKey.forEach(item => {
             document.getElementById(`in_${item.slot}`).value = '';
-            const charScreen = document.getElementById(`char_${item.slot}`);
-            charScreen.textContent = '?';
-            charScreen.classList.remove('active');
+            const light = document.getElementById(`light_${item.slot}`);
+            light.classList.remove('active');
         });
         document.getElementById('statusReadout').classList.add('hidden');
         document.getElementById('successBanner').classList.add('hidden');
