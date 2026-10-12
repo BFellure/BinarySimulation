@@ -23,7 +23,7 @@
             align-items: center;
             gap: 15px;
             width: 100%;
-            max-width: 950px;
+            max-width: 980px;
             padding: 15px;
             box-sizing: border-box;
         }
@@ -38,7 +38,6 @@
             width: 100%;
             box-sizing: border-box;
             position: relative;
-            overflow: hidden;
         }
 
         /* CRT Scanline Overlay Effect */
@@ -62,6 +61,8 @@
             border-bottom: 1px solid #1e293b;
             padding-bottom: 12px;
             margin-bottom: 15px;
+            position: relative;
+            z-index: 3;
         }
         .system-title {
             font-size: 0.95rem;
@@ -69,9 +70,6 @@
             color: #38bdf8;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
         .alarm-badge {
             background: rgba(239, 68, 68, 0.15);
@@ -99,6 +97,8 @@
             padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 20px;
+            position: relative;
+            z-index: 3;
         }
         .radar-screen {
             width: 40px;
@@ -126,31 +126,25 @@
             line-height: 1.4;
         }
 
-        /* Single Horizontal Row Container for 13 Boxes */
-        .row-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
+        /* Straight Horizontal Row of 13 Boxes */
         .single-row-grid {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            gap: 8px;
-            min-width: 820px; /* Ensures straight horizontal line on small screens */
+            display: grid;
+            grid-template-columns: repeat(13, minmax(0, 1fr));
+            gap: 6px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 3;
         }
 
-        /* Individual Box Styling */
+        /* Individual Box Unit */
         .box-unit {
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(15, 23, 42, 0.85);
             border: 1px solid #334155;
             border-radius: 6px;
-            padding: 8px 4px;
-            flex: 1;
+            padding: 6px 2px;
             transition: all 0.2s ease;
         }
         .box-unit:hover {
@@ -158,13 +152,13 @@
             box-shadow: 0 0 8px rgba(2, 132, 199, 0.4);
         }
         .box-tag {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: #64748b;
             font-weight: 700;
             margin-bottom: 4px;
         }
         .terminal-input {
-            width: 90%;
+            width: 92%;
             background: #020617;
             border: 1px solid #1e293b;
             color: #38bdf8;
@@ -172,7 +166,7 @@
             font-size: 0.75rem;
             font-weight: 700;
             text-align: center;
-            padding: 6px 2px;
+            padding: 5px 0;
             border-radius: 4px;
             outline: none;
             box-sizing: border-box;
@@ -183,15 +177,15 @@
         }
         .char-screen {
             margin-top: 6px;
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             display: flex;
             justify-content: center;
             align-items: center;
             background: #020617;
             border: 1px solid #1e293b;
             border-radius: 4px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 800;
             color: #475569;
         }
@@ -210,6 +204,8 @@
             padding: 15px;
             text-align: center;
             margin-bottom: 15px;
+            position: relative;
+            z-index: 3;
             box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
             animation: glowSuccess 1.5s infinite alternate;
         }
@@ -237,6 +233,8 @@
             display: flex;
             gap: 12px;
             width: 100%;
+            position: relative;
+            z-index: 3;
         }
         .action-btn {
             background: #0284c7;
@@ -273,6 +271,8 @@
             text-align: center;
             margin-top: 10px;
             letter-spacing: 0.05em;
+            position: relative;
+            z-index: 3;
         }
 
         .hidden {
@@ -325,4 +325,149 @@
 </head>
 <body>
 
-<div class="main-container
+<div class="main-container">
+    <div class="terminal-card">
+        <!-- Header Alarm / Status Bar -->
+        <div class="terminal-header">
+            <div class="system-title">🛰️ DEEP SPACE RECOVERY CONSOLE</div>
+            <div class="alarm-badge">⚠️ DISTRESS LOCKOUT ACTIVE</div>
+        </div>
+
+        <!-- Radar & Mission Briefing -->
+        <div class="briefing-row">
+            <div class="radar-screen">
+                <div class="radar-sweep"></div>
+            </div>
+            <div class="briefing-text">
+                <strong>MISSION DIRECTIVE:</strong> Input valid binary values into sequential slots #1 through #13 to override the communications relay and decode the distress frequency.
+            </div>
+        </div>
+
+        <!-- 13 Boxes in a Single Straight Horizontal Row -->
+        <div class="single-row-grid" id="boxRow">
+            <!-- Dynamically generated 13 sequential units -->
+        </div>
+
+        <!-- Success Message Banner -->
+        <div class="success-terminal hidden" id="successBanner">
+            <div class="success-title">🚨 OVERRIDE ACCEPTED - FREQUENCY BROADCASTING 🚨</div>
+            <div class="final-code-text">BITSANDPIECES</div>
+        </div>
+
+        <!-- Status Progress Readout -->
+        <div class="status-readout hidden" id="statusReadout"></div>
+
+        <!-- Controls -->
+        <div class="controls-bar" style="margin-top: 10px;">
+            <button class="action-btn" onclick="verifyTerminal()">[ DECODE TRANSMISSION ]</button>
+            <button class="action-btn secondary" onclick="resetTerminal()">[ RESET SYSTEM ]</button>
+        </div>
+
+        <!-- Footer Disclaimer Dropdown -->
+        <div class="disclaimer-container">
+            <button class="disclaimer-toggle" onclick="toggleDisclaimer()">Disclaimer</button>
+            <div class="disclaimer-content hidden" id="disclaimerBox">
+                <strong>Development & AI Disclaimer:</strong><br>
+                Purely the interactive components, such as quizzes and simulators, were generated using Google Gemini large language models with direct human oversight, design direction, and code validation by Bodin Fellure.<br><br>
+                Source code can be found at: <a href="https://github.com/BFellure/BinarySimulation/tree/main" target="_blank">https://github.com/BFellure/BinarySimulation/tree/main</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 13 Decimal answers mapping sequentially to spell B-I-T-S-A-N-D-P-I-E-C-E-S
+    const terminalKey = [
+        { slot: 1, expectedDec: 2, char: 'B' },
+        { slot: 2, expectedDec: 9, char: 'I' },
+        { slot: 3, expectedDec: 20, char: 'T' },
+        { slot: 4, expectedDec: 19, char: 'S' },
+        { slot: 5, expectedDec: 1, char: 'A' },
+        { slot: 6, expectedDec: 14, char: 'N' },
+        { slot: 7, expectedDec: 4, char: 'D' },
+        { slot: 8, expectedDec: 16, char: 'P' },
+        { slot: 9, expectedDec: 9, char: 'I' },
+        { slot: 10, expectedDec: 5, char: 'E' },
+        { slot: 11, expectedDec: 3, char: 'C' },
+        { slot: 12, expectedDec: 5, char: 'E' },
+        { slot: 13, expectedDec: 19, char: 'S' }
+    ];
+
+    function initTerminalRow() {
+        const row = document.getElementById('boxRow');
+        row.innerHTML = '';
+
+        terminalKey.forEach(item => {
+            const unit = document.createElement('div');
+            unit.className = 'box-unit';
+            unit.innerHTML = `
+                <span class="box-tag">#${item.slot}</span>
+                <input type="text" class="terminal-input" id="in_${item.slot}" placeholder="01" autocomplete="off">
+                <div class="char-screen" id="char_${item.slot}">?</div>
+            `;
+            row.appendChild(unit);
+        });
+    }
+
+    function toggleDisclaimer() {
+        let box = document.getElementById('disclaimerBox');
+        if (box.classList.contains('hidden')) {
+            box.classList.remove('hidden');
+        } else {
+            box.classList.add('hidden');
+        }
+    }
+
+    // Binary validation function supporting unlimited leading zeros
+    function checkBinary(inputVal, expectedDecimal) {
+        let trimmed = inputVal.trim();
+        if (trimmed === '' || trimmed === '0') return expectedDecimal === 0;
+        if (!/^[01]+$/.test(trimmed)) return false;
+        return parseInt(trimmed, 2) === expectedDecimal;
+    }
+
+    function verifyTerminal() {
+        let unlockedCount = 0;
+
+        terminalKey.forEach(item => {
+            const inputVal = document.getElementById(`in_${item.slot}`).value;
+            const charScreen = document.getElementById(`char_${item.slot}`);
+
+            if (checkBinary(inputVal, item.expectedDec)) {
+                unlockedCount++;
+                charScreen.textContent = item.char;
+                charScreen.classList.add('active');
+            } else {
+                charScreen.textContent = '?';
+                charScreen.classList.remove('active');
+            }
+        });
+
+        const statusReadout = document.getElementById('statusReadout');
+        statusReadout.textContent = `DECODED SLOTS: ${unlockedCount} / ${terminalKey.length}`;
+        statusReadout.classList.remove('hidden');
+
+        const successBanner = document.getElementById('successBanner');
+        if (unlockedCount === terminalKey.length) {
+            successBanner.classList.remove('hidden');
+        } else {
+            successBanner.classList.add('hidden');
+        }
+    }
+
+    function resetTerminal() {
+        terminalKey.forEach(item => {
+            document.getElementById(`in_${item.slot}`).value = '';
+            const charScreen = document.getElementById(`char_${item.slot}`);
+            charScreen.textContent = '?';
+            charScreen.classList.remove('active');
+        });
+        document.getElementById('statusReadout').classList.add('hidden');
+        document.getElementById('successBanner').classList.add('hidden');
+    }
+
+    window.onload = initTerminalRow;
+</script>
+
+</body>
+</html>
