@@ -250,6 +250,13 @@
             text-align: left;
             line-height: 1.4;
         }
+        .disclaimer-content a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .disclaimer-content a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -325,7 +332,8 @@
             <button class="disclaimer-toggle" onclick="toggleDisclaimer()">Disclaimer</button>
             <div class="disclaimer-content hidden" id="disclaimerBox">
                 <strong>Development & AI Disclaimer:</strong><br>
-                This web application's HTML5, CSS3, and JavaScript code was generated using Google Gemini large language models. Direct human oversight, specification design, question formulation, layout direction, and code validation were conducted by Bodin Fellure.
+                Purely the interactive components, such as quizzes and simulators, were generated using Google Gemini large language models with direct human oversight, design direction, and code validation by Bodin Fellure.<br><br>
+                Source code can be found at: <a href="https://github.com/BFellure/BinarySimulation/tree/main" target="_blank">https://github.com/BFellure/BinarySimulation/tree/main</a>
             </div>
         </div>
     </div>
