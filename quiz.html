@@ -124,7 +124,7 @@
             background: #fff;
         }
 
-        /* Example Button & Toggle Box */
+        /* Example Button & Custom Box Grid */
         .example-btn {
             background: #f1f5f9;
             border: 1px solid #cbd5e1;
@@ -140,15 +140,24 @@
         .example-btn:hover {
             background: #e2e8f0;
         }
+        .example-row {
+            display: flex;
+            gap: 8px;
+        }
         .example-box {
-            font-family: monospace;
-            font-size: 0.9rem;
-            background: #f8fafc;
-            padding: 10px;
+            width: 50px;
+            height: 45px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #eff6ff; /* Soft distinct blue tint */
+            border: 2px dashed #3b82f6; /* Blue dashed border */
             border-radius: 6px;
-            border: 1px dashed #cbd5e1;
-            color: #334155;
-            width: fit-content;
+            color: #1d4ed8; /* Dark blue text */
+            font-size: 0.8rem; /* Scaled font to fit cleanly */
+            font-weight: 700;
+            text-align: center;
+            box-sizing: border-box;
         }
 
         /* Feedback badges */
@@ -238,7 +247,17 @@
         <div class="question-block" id="q3-block">
             <div class="question-text">Write the value of each place in the binary number system in the boxes below, following the correct pattern.</div>
             <button class="example-btn" id="exampleBtn" onclick="toggleExample()">View Example in Decimal</button>
-            <div class="example-box hidden" id="exampleBox">[100000][10000][1000][100][10][1]</div>
+            
+            <!-- Scaled Decimal Example Boxes in Distinct Color -->
+            <div class="example-row hidden" id="exampleBox">
+                <div class="example-box">100000</div>
+                <div class="example-box">10000</div>
+                <div class="example-box">1000</div>
+                <div class="example-box">100</div>
+                <div class="example-box">10</div>
+                <div class="example-box">1</div>
+            </div>
+
             <div class="place-value-row">
                 <input type="text" class="pv-input" id="pv5" maxlength="3">
                 <input type="text" class="pv-input" id="pv4" maxlength="3">
