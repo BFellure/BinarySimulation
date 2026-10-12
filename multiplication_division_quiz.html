@@ -312,21 +312,28 @@
         }
     }
 
-    function checkVal(inputVal, expected) {
-        let cleaned = inputVal.trim().replace(/^0+/, '');
-        if (cleaned === '') cleaned = '0';
-        return cleaned === expected;
+    // Helper function supporting unlimited leading zeros via base 2 numerical parsing
+    function checkBinary(inputVal, expectedDecimal) {
+        let trimmed = inputVal.trim();
+        if (trimmed === '' || trimmed === '0') return expectedDecimal === 0;
+        
+        // Validate that it consists entirely of 0s and 1s
+        if (!/^[01]+$/.test(trimmed)) return false;
+
+        // parseInt naturally ignores any number of leading zeros when calculating base 2 value
+        let parsedDecimal = parseInt(trimmed, 2);
+        return parsedDecimal === expectedDecimal;
     }
 
     function gradeQuiz() {
         let score = 0;
         let total = 4;
 
-        // Question 1: 110 x 011 = 6 x 3 = 18 -> 10010 (Remainder: 0)
+        // Question 1: 110 x 011 = 18 (Binary: 10010, Remainder: 0)
         let ans1 = document.getElementById('ans1').value;
         let rem1 = document.getElementById('rem1').value;
         let feed1 = document.getElementById('feed1');
-        if (checkVal(ans1, '10010') && checkVal(rem1, '0')) {
+        if (checkBinary(ans1, 18) && checkBinary(rem1, 0)) {
             feed1.textContent = "✔ Correct!";
             feed1.className = "feedback correct";
             score++;
@@ -336,11 +343,11 @@
         }
         feed1.classList.remove('hidden');
 
-        // Question 2: 1001 x 101 = 9 x 5 = 45 -> 101101 (Remainder: 0)
+        // Question 2: 1001 x 101 = 45 (Binary: 101101, Remainder: 0)
         let ans2 = document.getElementById('ans2').value;
         let rem2 = document.getElementById('rem2').value;
         let feed2 = document.getElementById('feed2');
-        if (checkVal(ans2, '101101') && checkVal(rem2, '0')) {
+        if (checkBinary(ans2, 45) && checkBinary(rem2, 0)) {
             feed2.textContent = "✔ Correct!";
             feed2.className = "feedback correct";
             score++;
@@ -350,11 +357,11 @@
         }
         feed2.classList.remove('hidden');
 
-        // Question 3: 1100 ÷ 11 = 12 ÷ 3 = 4 -> 100 (Remainder: 0)
+        // Question 3: 1100 ÷ 11 = 4 (Binary: 100, Remainder: 0)
         let ans3 = document.getElementById('ans3').value;
         let rem3 = document.getElementById('rem3').value;
         let feed3 = document.getElementById('feed3');
-        if (checkVal(ans3, '100') && checkVal(rem3, '0')) {
+        if (checkBinary(ans3, 4) && checkBinary(rem3, 0)) {
             feed3.textContent = "✔ Correct!";
             feed3.className = "feedback correct";
             score++;
@@ -364,11 +371,11 @@
         }
         feed3.classList.remove('hidden');
 
-        // Question 4: 1110 ÷ 100 = 14 ÷ 4 = 3 remainder 2 -> Quotient: 11, Remainder: 10
+        // Question 4: 1110 ÷ 100 = 3 remainder 2 (Quotient Binary: 11, Remainder Binary: 10)
         let ans4 = document.getElementById('ans4').value;
         let rem4 = document.getElementById('rem4').value;
         let feed4 = document.getElementById('feed4');
-        if (checkVal(ans4, '11') && checkVal(rem4, '10')) {
+        if (checkBinary(ans4, 3) && checkBinary(rem4, 2)) {
             feed4.textContent = "✔ Correct!";
             feed4.className = "feedback correct";
             score++;
