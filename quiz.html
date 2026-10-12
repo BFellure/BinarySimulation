@@ -217,6 +217,46 @@
             color: #1e293b;
             text-align: center;
         }
+
+        /* Disclaimer Section */
+        .disclaimer-container {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 15px;
+            margin-top: 5px;
+            text-align: center;
+        }
+        .disclaimer-toggle {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+            transition: color 0.2s;
+        }
+        .disclaimer-toggle:hover {
+            color: #3b82f6;
+        }
+        .disclaimer-content {
+            font-size: 0.75rem;
+            color: #64748b;
+            background: #f8fafc;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            margin-top: 10px;
+            text-align: left;
+            line-height: 1.4;
+        }
+        .disclaimer-content a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .disclaimer-content a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -286,6 +326,16 @@
             <button class="sim-btn" onclick="gradeQuiz()">Submit Answers</button>
             <button class="sim-btn secondary" onclick="resetQuiz()">Reset Quiz</button>
         </div>
+
+        <!-- Footer Disclaimer Dropdown -->
+        <div class="disclaimer-container">
+            <button class="disclaimer-toggle" onclick="toggleDisclaimer()">Disclaimer</button>
+            <div class="disclaimer-content hidden" id="disclaimerBox">
+                <strong>Development & AI Disclaimer:</strong><br>
+                Purely the interactive components (such as this quiz and the simulators) were generated using Google Gemini large language models with direct human oversight, design direction, and code validation by Bodin Fellure. This does not apply to any other content found on this site (such as the webquest).<br><br>
+                Source code can be found at: <a href="https://github.com/BFellure/BinarySimulation/tree/main" target="_blank">https://github.com/BFellure/BinarySimulation/tree/main</a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -299,6 +349,15 @@
         } else {
             box.classList.add('hidden');
             btn.textContent = 'View Example in Decimal';
+        }
+    }
+
+    function toggleDisclaimer() {
+        let box = document.getElementById('disclaimerBox');
+        if (box.classList.contains('hidden')) {
+            box.classList.remove('hidden');
+        } else {
+            box.classList.add('hidden');
         }
     }
 
