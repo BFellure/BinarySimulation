@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Space Distress Call - Answer Console</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: transparent; /* Transparent background for Google Sites embedding */
+            font-family: system-ui, -apple-system, sans-serif;
+            color: #1e293b;
+        }
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .escape-card {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* Mission Briefing Banner */
+        .mission-banner {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #334155;
+            line-height: 1.4;
+            text-align: center;
+        }
+        .mission-banner h3 {
+            margin: 0 0 4px 0;
+            color: #1e293b;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* 13-Box Grid */
+        .boxes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+        .box-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            border-radius: 8px;
+            gap: 6px;
+        }
+        .box-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #475569;
+        }
+        .box-input {
+            width: 100%;
+            padding: 8px;
+            font-size: 0.85rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+            background: #fff;
+            font-family: monospace;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .box-input:focus {
+            border-color: #3b82f6;
+        }
+        .letter-slot {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #64748b;
+            height: 20px;
+        }
+        .letter-slot.unlocked {
+            color: #16a34a;
+        }
+
+        /* Success Transmission Banner */
+        .transmission-box {
+            background: #eff6ff;
+            border: 2px dashed #3b82f6;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            color: #1d4ed8;
+            font-weight: 700;
+        }
+        .transmission-code {
+            font-family: monospace;
+            font-size: 1.4rem;
+            letter-spacing: 0.15em;
+            margin-top: 5px;
+            color: #1e3a8a;
+        }
+
+        /* Controls Area */
+        .controls-row {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+        .sim-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background 0.2s;
+            flex: 1;
+        }
+        .sim-btn:hover {
+            background: #2563eb;
+        }
+        .sim-btn.secondary {
+            background: #64748b;
+        }
+        .sim-btn.secondary:hover {
+            background: #475569;
+        }
+
+        .score-display {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #1e293b;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Disclaimer Section */
+        .disclaimer-container {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 15px;
+            margin-top: 5px;
+            text-align: center;
+        }
+        .disclaimer-toggle {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+            transition: color 0.2s;
+        }
+        .disclaimer-toggle:hover {
+            color: #3b82f6;
+        }
+        .disclaimer-content {
+            font-size: 0.75rem;
+            color: #64748b;
+            background: #f8fafc;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            margin-top: 10px;
+            text-align: left;
+            line-height: 1.4;
+        }
+        .disclaimer-content a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .disclaimer-content a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="escape-card">
+        <!-- Mission Briefing -->
+        <div class="mission-banner">
+            <h3>Secret Code Decoder Console</h3>
+            <p style="margin: 0;">Enter your answers into boxes 1 through 13 to decode the hidden distress message.</p>
+        </div>
+
+        <!-- 13 Numbered Sequential Answer Boxes -->
+        <div class="boxes-grid" id="boxesGrid">
+            <!-- Populated via script -->
+        </div>
+
+        <!-- Success Transmission Readout -->
+        <div class="transmission-box hidden" id="transmissionBox">
+            <div>🚨 DISTRESS SIGNAL TRANSMITTED SUCCESSFULLY! 🚨</div>
+            <div class="transmission-code">BITSANDPIECES</div>
+        </div>
+
+        <!-- Score Banner -->
+        <div class="score-display hidden" id="scoreBanner"></div>
+
+        <!-- Control Buttons -->
+        <div class="controls-row">
+            <button class="sim-btn" onclick="verifyConsole()">Verify Code</button>
+            <button class="sim-btn secondary" onclick="resetConsole()">Reset Console</button>
+        </div>
+
+        <!-- Footer Disclaimer Dropdown -->
+        <div class="disclaimer-container">
+            <button class="disclaimer-toggle" onclick="toggleDisclaimer()">Disclaimer</button>
+            <div class="disclaimer-content hidden" id="disclaimerBox">
+                <strong>Development & AI Disclaimer:</strong><br>
+                Purely the interactive components, such as quizzes and simulators, were generated using Google Gemini large language models with direct human oversight, design direction, and code validation by Bodin Fellure.<br><br>
+                Source code can be found at: <a href="https://github.com/BFellure/BinarySimulation/tree/main" target="_blank">https://github.com/BFellure/BinarySimulation/tree/main</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Target answers mapped sequentially to spell B-I-T-S-A-N-D-P-I-E-C-E-S
+    const answerKey = [
+        { box: 1, expectedDec: 2, char: 'B' },
+        { box: 2, expectedDec: 9, char: 'I' },
+        { box: 3, expectedDec: 20, char: 'T' },
+        { box: 4, expectedDec: 19, char: 'S' },
+        { box: 5, expectedDec: 1, char: 'A' },
+        { box: 6, expectedDec: 14, char: 'N' },
+        { box: 7, expectedDec: 4, char: 'D' },
+        { box: 8, expectedDec: 16, char: 'P' },
+        { box: 9, expectedDec: 9, char: 'I' },
+        { box: 10, expectedDec: 5, char: 'E' },
+        { box: 11, expectedDec: 3, char: 'C' },
+        { box: 12, expectedDec: 5, char: 'E' },
+        { box: 13, expectedDec: 19, char: 'S' }
+    ];
+
+    function initBoxes() {
+        const grid = document.getElementById('boxesGrid');
+        grid.innerHTML = '';
+
+        answerKey.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'box-item';
+            div.innerHTML = `
+                <span class="box-label">Box #${item.box}</span>
+                <input type="text" class="box-input" id="box_${item.box}" placeholder="Answer">
+                <span class="letter-slot" id="slot_${item.box}">?</span>
+            `;
+            grid.appendChild(div);
+        });
+    }
+
+    function toggleDisclaimer() {
+        let box = document.getElementById('disclaimerBox');
+        if (box.classList.contains('hidden')) {
+            box.classList.remove('hidden');
+        } else {
+            box.classList.add('hidden');
+        }
+    }
+
+    function checkAnswer(inputVal, expectedDecimal) {
+        let trimmed = inputVal.trim();
+        if (trimmed === '' || trimmed === '0') return expectedDecimal === 0;
+        if (!/^[01]+$/.test(trimmed)) return false;
+        return parseInt(trimmed, 2) === expectedDecimal;
+    }
+
+    function verifyConsole() {
+        let correctCount = 0;
+
+        answerKey.forEach(item => {
+            const val = document.getElementById(`box_${item.box}`).value;
+            const slot = document.getElementById(`slot_${item.box}`);
+
+            if (checkAnswer(val, item.expectedDec)) {
+                correctCount++;
+                slot.textContent = item.char;
+                slot.classList.add('unlocked');
+            } else {
+                slot.textContent = '?';
+                slot.classList.remove('unlocked');
+            }
+        });
+
+        let scoreBanner = document.getElementById('scoreBanner');
+        scoreBanner.textContent = `Correct Answers: ${correctCount} / ${answerKey.length}`;
+        scoreBanner.classList.remove('hidden');
+
+        let transmissionBox = document.getElementById('transmissionBox');
+        if (correctCount === answerKey.length) {
+            transmissionBox.classList.remove('hidden');
+        } else {
+            transmissionBox.classList.add('hidden');
+        }
+    }
+
+    function resetConsole() {
+        answerKey.forEach(item => {
+            document.getElementById(`box_${item.box}`).value = '';
+            const slot = document.getElementById(`slot_${item.box}`);
+            slot.textContent = '?';
+            slot.classList.remove('unlocked');
+        });
+        document.getElementById('scoreBanner').classList.add('hidden');
+        document.getElementById('transmissionBox').classList.add('hidden');
+    }
+
+    window.onload = initBoxes;
+</script>
+
+</body>
+</html>
