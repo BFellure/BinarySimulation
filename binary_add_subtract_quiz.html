@@ -252,14 +252,27 @@
         }
     }
 
+    // Helper function supporting multiple leading zeros via base 2 numerical parsing
+    function checkBinary(inputVal, expectedDecimal) {
+        let trimmed = inputVal.trim();
+        if (trimmed === '' || trimmed === '0') return expectedDecimal === 0;
+        
+        // Validate that it consists entirely of 0s and 1s
+        if (!/^[01]+$/.test(trimmed)) return false;
+
+        // parseInt naturally ignores any number of leading zeros when calculating base 2 value
+        let parsedDecimal = parseInt(trimmed, 2);
+        return parsedDecimal === expectedDecimal;
+    }
+
     function gradeQuiz() {
         let score = 0;
         let total = 4;
 
         // Question 1: 10010 + 00101 = 10111 (18 + 5 = 23)
-        let raw1 = document.getElementById('ans1').value.trim().replace(/^0+/, '');
+        let ans1 = document.getElementById('ans1').value;
         let feed1 = document.getElementById('feed1');
-        if (raw1 === '10111') {
+        if (checkBinary(ans1, 23)) {
             feed1.textContent = "✔ Correct!";
             feed1.className = "feedback correct";
             score++;
@@ -270,9 +283,9 @@
         feed1.classList.remove('hidden');
 
         // Question 2: 10011 + 00111 = 11010 (19 + 7 = 26)
-        let raw2 = document.getElementById('ans2').value.trim().replace(/^0+/, '');
+        let ans2 = document.getElementById('ans2').value;
         let feed2 = document.getElementById('feed2');
-        if (raw2 === '11010') {
+        if (checkBinary(ans2, 26)) {
             feed2.textContent = "✔ Correct!";
             feed2.className = "feedback correct";
             score++;
@@ -282,10 +295,10 @@
         }
         feed2.classList.remove('hidden');
 
-        // Question 3: 111 - 101 = 010 or 10 (7 - 5 = 2)
-        let raw3 = document.getElementById('ans3').value.trim().replace(/^0+/, '');
+        // Question 3: 111 - 101 = 10 (7 - 5 = 2)
+        let ans3 = document.getElementById('ans3').value;
         let feed3 = document.getElementById('feed3');
-        if (raw3 === '10') {
+        if (checkBinary(ans3, 2)) {
             feed3.textContent = "✔ Correct!";
             feed3.className = "feedback correct";
             score++;
@@ -296,9 +309,9 @@
         feed3.classList.remove('hidden');
 
         // Question 4: 11001 - 01001 = 10000 (25 - 9 = 16)
-        let raw4 = document.getElementById('ans4').value.trim().replace(/^0+/, '');
+        let ans4 = document.getElementById('ans4').value;
         let feed4 = document.getElementById('feed4');
-        if (raw4 === '10000') {
+        if (checkBinary(ans4, 16)) {
             feed4.textContent = "✔ Correct!";
             feed4.className = "feedback correct";
             score++;
