@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Multiplication & Division Quiz</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: transparent; /* Transparent background for Google Sites embedding */
+            font-family: system-ui, -apple-system, sans-serif;
+            color: #1e293b;
+        }
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .quiz-card {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* Instructions Banner */
+        .instructions-banner {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #475569;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        /* Question Item */
+        .question-block {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .question-block:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .question-text {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #334155;
+            line-height: 1.4;
+        }
+
+        /* Inputs Row & Fields */
+        .inputs-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .input-field-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-grow: 1;
+        }
+        .input-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+        }
+        .quiz-input {
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s;
+            background: #f8fafc;
+            font-family: monospace;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .quiz-input:focus {
+            border-color: #3b82f6;
+            background: #fff;
+        }
+        .remainder-wrapper {
+            max-width: 160px;
+        }
+
+        /* Feedback badges */
+        .feedback {
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            width: fit-content;
+        }
+        .feedback.correct {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .feedback.incorrect {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .hidden {
+            display: none;
+        }
+
+        /* Controls Area */
+        .controls-row {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .sim-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background 0.2s;
+            flex: 1;
+        }
+        .sim-btn:hover {
+            background: #2563eb;
+        }
+        .sim-btn.secondary {
+            background: #64748b;
+        }
+        .sim-btn.secondary:hover {
+            background: #475569;
+        }
+
+        .score-display {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #1e293b;
+            text-align: center;
+        }
+
+        /* Disclaimer Section */
+        .disclaimer-container {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 15px;
+            margin-top: 5px;
+            text-align: center;
+        }
+        .disclaimer-toggle {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+            transition: color 0.2s;
+        }
+        .disclaimer-toggle:hover {
+            color: #3b82f6;
+        }
+        .disclaimer-content {
+            font-size: 0.75rem;
+            color: #64748b;
+            background: #f8fafc;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            margin-top: 10px;
+            text-align: left;
+            line-height: 1.4;
+        }
+        .disclaimer-content a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .disclaimer-content a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="quiz-card">
+        <!-- Instructions Banner -->
+        <div class="instructions-banner">
+            If an answer does not have a remainder, simply leave the remainder box empty or put 0.
+        </div>
+
+        <!-- Question 1 -->
+        <div class="question-block" id="q1-block">
+            <div class="question-text">1. What is 110 x 011</div>
+            <div class="inputs-group">
+                <div class="input-field-wrapper">
+                    <span class="input-label">Answer</span>
+                    <input type="text" class="quiz-input" id="ans1" placeholder="Enter product">
+                </div>
+                <div class="input-field-wrapper remainder-wrapper">
+                    <span class="input-label">Remainder (if any)</span>
+                    <input type="text" class="quiz-input" id="rem1" placeholder="0 or leave blank">
+                </div>
+            </div>
+            <div class="feedback hidden" id="feed1"></div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="question-block" id="q2-block">
+            <div class="question-text">2. What is 1001 x 101</div>
+            <div class="inputs-group">
+                <div class="input-field-wrapper">
+                    <span class="input-label">Answer</span>
+                    <input type="text" class="quiz-input" id="ans2" placeholder="Enter product">
+                </div>
+                <div class="input-field-wrapper remainder-wrapper">
+                    <span class="input-label">Remainder (if any)</span>
+                    <input type="text" class="quiz-input" id="rem2" placeholder="0 or leave blank">
+                </div>
+            </div>
+            <div class="feedback hidden" id="feed2"></div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="question-block" id="q3-block">
+            <div class="question-text">3. What is 1100 ÷ 11</div>
+            <div class="inputs-group">
+                <div class="input-field-wrapper">
+                    <span class="input-label">Answer</span>
+                    <input type="text" class="quiz-input" id="ans3" placeholder="Enter quotient">
+                </div>
+                <div class="input-field-wrapper remainder-wrapper">
+                    <span class="input-label">Remainder (if any)</span>
+                    <input type="text" class="quiz-input" id="rem3" placeholder="0 or leave blank">
+                </div>
+            </div>
+            <div class="feedback hidden" id="feed3"></div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="question-block" id="q4-block">
+            <div class="question-text">4. What is 1110 ÷ 100</div>
+            <div class="inputs-group">
+                <div class="input-field-wrapper">
+                    <span class="input-label">Answer</span>
+                    <input type="text" class="quiz-input" id="ans4" placeholder="Enter quotient">
+                </div>
+                <div class="input-field-wrapper remainder-wrapper">
+                    <span class="input-label">Remainder (if any)</span>
+                    <input type="text" class="quiz-input" id="rem4" placeholder="0 or leave blank">
+                </div>
+            </div>
+            <div class="feedback hidden" id="feed4"></div>
+        </div>
+
+        <!-- Score Banner -->
+        <div class="score-display hidden" id="scoreBanner"></div>
+
+        <!-- Control Buttons -->
+        <div class="controls-row">
+            <button class="sim-btn" onclick="gradeQuiz()">Submit Answers</button>
+            <button class="sim-btn secondary" onclick="resetQuiz()">Reset Quiz</button>
+        </div>
+
+        <!-- Footer Disclaimer Dropdown -->
+        <div class="disclaimer-container">
+            <button class="disclaimer-toggle" onclick="toggleDisclaimer()">Disclaimer</button>
+            <div class="disclaimer-content hidden" id="disclaimerBox">
+                <strong>Development & AI Disclaimer:</strong><br>
+                Purely the interactive components, such as quizzes and simulators, were generated using Google Gemini large language models with direct human oversight, design direction, and code validation by Bodin Fellure.<br><br>
+                Source code can be found at: <a href="https://github.com/BFellure/BinarySimulation/tree/main" target="_blank">https://github.com/BFellure/BinarySimulation/tree/main</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleDisclaimer() {
+        let box = document.getElementById('disclaimerBox');
+        if (box.classList.contains('hidden')) {
+            box.classList.remove('hidden');
+        } else {
+            box.classList.add('hidden');
+        }
+    }
+
+    function checkVal(inputVal, expected) {
+        let cleaned = inputVal.trim().replace(/^0+/, '');
+        if (cleaned === '') cleaned = '0';
+        return cleaned === expected;
+    }
+
+    function gradeQuiz() {
+        let score = 0;
+        let total = 4;
+
+        // Question 1: 110 x 011 = 6 x 3 = 18 -> 10010 (Remainder: 0)
+        let ans1 = document.getElementById('ans1').value;
+        let rem1 = document.getElementById('rem1').value;
+        let feed1 = document.getElementById('feed1');
+        if (checkVal(ans1, '10010') && checkVal(rem1, '0')) {
+            feed1.textContent = "✔ Correct!";
+            feed1.className = "feedback correct";
+            score++;
+        } else {
+            feed1.textContent = "✘ Incorrect";
+            feed1.className = "feedback incorrect";
+        }
+        feed1.classList.remove('hidden');
+
+        // Question 2: 1001 x 101 = 9 x 5 = 45 -> 101101 (Remainder: 0)
+        let ans2 = document.getElementById('ans2').value;
+        let rem2 = document.getElementById('rem2').value;
+        let feed2 = document.getElementById('feed2');
+        if (checkVal(ans2, '101101') && checkVal(rem2, '0')) {
+            feed2.textContent = "✔ Correct!";
+            feed2.className = "feedback correct";
+            score++;
+        } else {
+            feed2.textContent = "✘ Incorrect";
+            feed2.className = "feedback incorrect";
+        }
+        feed2.classList.remove('hidden');
+
+        // Question 3: 1100 ÷ 11 = 12 ÷ 3 = 4 -> 100 (Remainder: 0)
+        let ans3 = document.getElementById('ans3').value;
+        let rem3 = document.getElementById('rem3').value;
+        let feed3 = document.getElementById('feed3');
+        if (checkVal(ans3, '100') && checkVal(rem3, '0')) {
+            feed3.textContent = "✔ Correct!";
+            feed3.className = "feedback correct";
+            score++;
+        } else {
+            feed3.textContent = "✘ Incorrect";
+            feed3.className = "feedback incorrect";
+        }
+        feed3.classList.remove('hidden');
+
+        // Question 4: 1110 ÷ 100 = 14 ÷ 4 = 3 remainder 2 -> Quotient: 11, Remainder: 10
+        let ans4 = document.getElementById('ans4').value;
+        let rem4 = document.getElementById('rem4').value;
+        let feed4 = document.getElementById('feed4');
+        if (checkVal(ans4, '11') && checkVal(rem4, '10')) {
+            feed4.textContent = "✔ Correct!";
+            feed4.className = "feedback correct";
+            score++;
+        } else {
+            feed4.textContent = "✘ Incorrect";
+            feed4.className = "feedback incorrect";
+        }
+        feed4.classList.remove('hidden');
+
+        // Show Final Score
+        let scoreBanner = document.getElementById('scoreBanner');
+        scoreBanner.textContent = `Total Score: ${score} / ${total}`;
+        scoreBanner.classList.remove('hidden');
+    }
+
+    function resetQuiz() {
+        for (let i = 1; i <= 4; i++) {
+            document.getElementById(`ans${i}`).value = '';
+            document.getElementById(`rem${i}`).value = '';
+            let feed = document.getElementById(`feed${i}`);
+            feed.classList.add('hidden');
+        }
+        document.getElementById('scoreBanner').classList.add('hidden');
+    }
+</script>
+
+</body>
+</html>
