@@ -38,36 +38,6 @@
             min-width: 520px;
             box-sizing: border-box;
         }
-        .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-        .title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin: 0;
-        }
-
-        /* Toggle Button */
-        .toggle-view-btn {
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            color: #475569;
-            padding: 5px 10px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .toggle-view-btn:hover {
-            background: #e2e8f0;
-        }
 
         /* Simulator View Panel */
         .view-panel {
@@ -160,56 +130,6 @@
             color: #ca8a04;
         }
 
-        /* Math Dropdown Section (Initially Hidden) */
-        .math-dropdown {
-            width: 100%;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 1px solid transparent;
-            box-sizing: border-box;
-        }
-        .math-dropdown.open {
-            max-height: 250px;
-            padding: 15px;
-            border-color: #e2e8f0;
-        }
-        .math-content {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            font-size: 0.85rem;
-            color: #334155;
-        }
-        .math-equation {
-            font-family: monospace;
-            font-size: 0.9rem;
-            background: #fff;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-            text-align: center;
-            word-break: break-all;
-        }
-        .math-breakdown-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            font-size: 0.75rem;
-        }
-        .math-item {
-            background: #fff;
-            padding: 5px;
-            border-radius: 4px;
-            border: 1px solid #e2e8f0;
-            text-align: center;
-        }
-
         /* Controls Area */
         .controls-row {
             display: flex;
@@ -290,11 +210,6 @@
 
 <div class="main-container">
     <div class="interactive-stage">
-        <div class="header-row">
-            <h2 class="title">8-Bit Up/Down Binary Counter</h2>
-            <button class="toggle-view-btn" id="toggleBtn" onclick="toggleMathDropdown()">Explain Math ▼</button>
-        </div>
-
         <!-- SIMULATOR VIEW -->
         <div class="view-panel" id="simView">
             <div class="decimal-display" id="decimalOutput">0</div>
@@ -342,18 +257,6 @@
             </div>
         </div>
 
-        <!-- MATH EXPLANATION DROPDOWN (Directly Below) -->
-        <div class="math-dropdown" id="mathDropdown">
-            <div class="math-content">
-                <strong>Binary Calculation Breakdown:</strong>
-                <p style="margin: 0; color: #64748b; font-size: 0.8rem;">Sum of active place values ($128$ down to $1$):</p>
-                <div class="math-equation" id="mathEquation">0 = 0</div>
-                <ul class="math-breakdown-list" id="mathList">
-                    <!-- Populated dynamically -->
-                </ul>
-            </div>
-        </div>
-
         <!-- Control Buttons -->
         <div class="controls-row">
             <button class="sim-btn secondary" onclick="stepCounter(-1)">- Down</button>
@@ -378,22 +281,6 @@
     let counterValue = 0;
     let autoInterval = null;
     let autoDirection = 1;
-    let isMathOpen = false;
-
-    function toggleMathDropdown() {
-        isMathOpen = !isMathOpen;
-        const dropdown = document.getElementById('mathDropdown');
-        const toggleBtn = document.getElementById('toggleBtn');
-
-        if (isMathOpen) {
-            dropdown.classList.add('open');
-            toggleBtn.textContent = 'Explain Math ▲';
-            updateMathExplanation();
-        } else {
-            dropdown.classList.remove('open');
-            toggleBtn.textContent = 'Explain Math ▼';
-        }
-    }
 
     function toggleDisclaimer() {
         let box = document.getElementById('disclaimerBox');
@@ -455,35 +342,6 @@
         }
 
         document.getElementById('decimalOutput').textContent = counterValue;
-
-        if (isMathOpen) {
-            updateMathExplanation();
-        }
-    }
-
-    function updateMathExplanation() {
-        const powers = [128, 64, 32, 16, 8, 4, 2, 1];
-        const binaryString = counterValue.toString(2).padStart(8, '0');
-        
-        let activeTerms = [];
-        let listHtml = '';
-
-        for (let i = 0; i < 8; i++) {
-            let bitVal = parseInt(binaryString[i]);
-            let weight = powers[i];
-            let product = bitVal * weight;
-
-            if (bitVal === 1) {
-                activeTerms.push(`${weight}`);
-            }
-
-            listHtml += `<li class="math-item"><b>${weight}</b>×${bitVal}=${product}</li>`;
-        }
-
-        let equationString = activeTerms.length > 0 ? activeTerms.join(' + ') + ` = ${counterValue}` : `0 = 0`;
-        
-        document.getElementById('mathEquation').textContent = equationString;
-        document.getElementById('mathList').innerHTML = listHtml;
     }
 
     function stepCounter(direction) {
