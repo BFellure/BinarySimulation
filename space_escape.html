@@ -16,7 +16,6 @@
             background: transparent; /* Transparent for Google Sites embedding */
             font-family: 'Courier New', Courier, monospace;
             color: #e2e8f0;
-            overflow-x: hidden;
         }
         .main-container {
             display: flex;
@@ -31,21 +30,9 @@
             z-index: 2;
         }
 
-        /* Starfield Particle Canvas Background */
-        #spaceCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0.65;
-        }
-
         /* Sci-Fi CRT Monitor Frame */
         .terminal-card {
-            background: rgba(15, 23, 42, 0.94);
+            background: #0f172a;
             border: 2px solid #0ea5e9;
             border-radius: 12px;
             box-shadow: 0 0 30px rgba(14, 165, 233, 0.3), inset 0 0 20px rgba(14, 165, 233, 0.15);
@@ -53,7 +40,6 @@
             width: 100%;
             box-sizing: border-box;
             position: relative;
-            backdrop-filter: blur(8px);
             transition: border-color 0.4s ease, box-shadow 0.4s ease;
         }
 
@@ -79,7 +65,7 @@
             top: 0; left: 0; bottom: 0; right: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%);
             background-size: 100% 4px;
-            z-index: 2;
+            z-index: 1;
             pointer-events: none;
             opacity: 0.5;
             border-radius: 10px;
@@ -187,7 +173,7 @@
             border: 1px solid #475569;
             border-radius: 6px;
             padding: 6px 2px;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s ease;
         }
         .box-unit:hover {
             border-color: #0ea5e9;
@@ -373,17 +359,15 @@
         }
         .disclaimer-content a {
             color: #38bdf8;
-            text-decoration: none;
+            text-decoration: underline;
+            cursor: pointer;
         }
         .disclaimer-content a:hover {
-            text-decoration: underline;
+            color: #7dd3fc;
         }
     </style>
 </head>
 <body>
-
-<!-- Animated Canvas Background for Space Particle Dust -->
-<canvas id="spaceCanvas"></canvas>
 
 <div class="main-container">
     <div class="terminal-card" id="terminalCard">
@@ -405,7 +389,7 @@
 
         <!-- 13 Boxes in a Single Straight Horizontal Row -->
         <div class="single-row-grid" id="boxRow">
-            <!-- Dynamically generated 13 sequential units -->
+            <!-- Generated dynamically on window load -->
         </div>
 
         <!-- Success Message Banner -->
@@ -429,7 +413,7 @@
             <div class="disclaimer-content hidden" id="disclaimerBox">
                 <strong>Development & AI Disclaimer:</strong><br>
                 Purely the interactive components, such as quizzes and simulators, were generated using Google Gemini large language models with direct human oversight, design direction, and code validation by Bodin Fellure.<br><br>
-                Source code can be found at: <a href="https://github.com/BFellure/BinarySimulation/tree/main" target="_blank">https://github.com/BFellure/BinarySimulation/tree/main</a>
+                Source code can be found at: <a href="https://github.com/BFellure/BinarySimulation/tree/main" target="_blank" rel="noopener noreferrer">https://github.com/BFellure/BinarySimulation/tree/main</a>
             </div>
         </div>
     </div>
@@ -453,25 +437,213 @@
         { slot: 13, char: 'S' }
     ];
 
-    /* --- Background Space Particle Dust Canvas Engine --- */
-    function initSpaceCanvas() {
-        const canvas = document.getElementById('spaceCanvas');
-        const ctx = canvas.getContext('2d');
-        let width = canvas.width = window.innerWidth;
-        let height = canvas.height = window.innerHeight;
+    /* --- Audio Synthesizer (Web Audio API) --- */
+    let audioCtx = null;
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
 
-        window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
+    function playKeyClickSound() {
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(850, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(320, audioCtx.currentTime + 0.03);
+            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.03);
+        } catch (e) {}
+    }
+
+    function playSuccessChime() {
+        try {
+            initAudio();
+            const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+            notes.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + index * 0.07);
+                gain.gain.setValueAtTime(0.09, audioCtx.currentTime + index * 0.07);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + index * 0.07 + 0.35);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + index * 0.07);
+                osc.stop(audioCtx.currentTime + index * 0.07 + 0.35);
+            });
+        } catch (e) {}
+    }
+
+    function playErrorSound() {
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(190, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.16);
+            gain.gain.setValueAtTime(0.09, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.16);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.16);
+        } catch (e) {}
+    }
+
+    function triggerGlitchShake() {
+        const card = document.getElementById('terminalCard');
+        card.classList.add('glitch-shake');
+        setTimeout(() => {
+            card.classList.remove('glitch-shake');
+        }, 300);
+    }
+
+    function initTerminalRow() {
+        const row = document.getElementById('boxRow');
+        row.innerHTML = '';
+
+        terminalKey.forEach(item => {
+            const unit = document.createElement('div');
+            unit.className = 'box-unit';
+            unit.innerHTML = `
+                <span class="box-tag">#${item.slot}</span>
+                <input type="text" class="terminal-input" id="in_${item.slot}" maxlength="1" placeholder="-" autocomplete="off" oninput="handleInput(event, ${item.slot})">
+                <button class="check-btn" id="chk_${item.slot}" onclick="checkSingleSlot(${item.slot})">CHK</button>
+            `;
+            row.appendChild(unit);
+        });
+    }
+
+    function handleInput(e, currentSlot) {
+        playKeyClickSound();
+        const input = e.target;
+        if (input.value.length >= 1 && currentSlot < 13) {
+            const nextInput = document.getElementById(`in_${currentSlot + 1}`);
+            if (nextInput) {
+                nextInput.focus();
+                nextInput.select();
+            }
+        }
+    }
+
+    function checkSingleSlot(slotNum) {
+        const item = terminalKey.find(k => k.slot === slotNum);
+        const inputVal = document.getElementById(`in_${slotNum}`).value.trim().toUpperCase();
+        const chkBtn = document.getElementById(`chk_${slotNum}`);
+
+        if (inputVal === item.char) {
+            chkBtn.textContent = "✓";
+            chkBtn.classList.add('active');
+            playKeyClickSound();
+        } else {
+            chkBtn.textContent = "✗";
+            chkBtn.classList.remove('active');
+            playErrorSound();
+            triggerGlitchShake();
+            setTimeout(() => { chkBtn.textContent = "CHK"; }, 800);
+        }
+        
+        evaluateOverallState();
+    }
+
+    function toggleDisclaimer() {
+        let box = document.getElementById('disclaimerBox');
+        if (box.classList.contains('hidden')) {
+            box.classList.remove('hidden');
+        } else {
+            box.classList.add('hidden');
+        }
+    }
+
+    function evaluateOverallState() {
+        let unlockedCount = 0;
+
+        terminalKey.forEach(item => {
+            const inputVal = document.getElementById(`in_${item.slot}`).value.trim().toUpperCase();
+            const chkBtn = document.getElementById(`chk_${item.slot}`);
+
+            if (inputVal === item.char) {
+                unlockedCount++;
+                chkBtn.textContent = "✓";
+                chkBtn.classList.add('active');
+            }
         });
 
-        const numParticles = 60;
-        const particles = [];
+        const statusReadout = document.getElementById('statusReadout');
+        statusReadout.textContent = `DECODED SLOTS: ${unlockedCount} / ${terminalKey.length}`;
+        statusReadout.classList.remove('hidden');
 
-        for (let i = 0; i < numParticles; i++) {
-            particles.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                radius: Math.random() * 1.5 + 0.5,
-                vx: (Math.random() - 0.5) * 0.3,
-                vy: (
+        const alarmBadge = document.getElementById('alarmBadge');
+        const successBanner = document.getElementById('successBanner');
+        const terminalCard = document.getElementById('terminalCard');
+
+        if (unlockedCount === terminalKey.length) {
+            successBanner.classList.remove('hidden');
+            alarmBadge.textContent = "🟢 SYSTEM OVERRIDE SUCCESSFUL";
+            alarmBadge.classList.add('success');
+            terminalCard.style.borderColor = "#22c55e";
+            terminalCard.style.boxShadow = "0 0 40px rgba(34, 197, 94, 0.5)";
+            playSuccessChime();
+        } else {
+            successBanner.classList.add('hidden');
+            alarmBadge.textContent = "⚠️ DISTRESS LOCKOUT ACTIVE";
+            alarmBadge.classList.remove('success');
+            terminalCard.style.borderColor = "#0ea5e9";
+            terminalCard.style.boxShadow = "0 0 30px rgba(14, 165, 233, 0.3)";
+        }
+    }
+
+    function verifyTerminal() {
+        evaluateOverallState();
+        let unlockedCount = terminalKey.filter(item => {
+            return document.getElementById(`in_${item.slot}`).value.trim().toUpperCase() === item.char;
+        }).length;
+
+        if (unlockedCount < terminalKey.length) {
+            playErrorSound();
+            triggerGlitchShake();
+        }
+    }
+
+    function resetTerminal() {
+        playErrorSound();
+        triggerGlitchShake();
+        terminalKey.forEach(item => {
+            document.getElementById(`in_${item.slot}`).value = '';
+            const chkBtn = document.getElementById(`chk_${item.slot}`);
+            chkBtn.textContent = "CHK";
+            chkBtn.classList.remove('active');
+        });
+        document.getElementById('statusReadout').classList.add('hidden');
+        document.getElementById('successBanner').classList.add('hidden');
+
+        const alarmBadge = document.getElementById('alarmBadge');
+        alarmBadge.textContent = "⚠️ DISTRESS LOCKOUT ACTIVE";
+        alarmBadge.classList.remove('success');
+
+        const terminalCard = document.getElementById('terminalCard');
+        terminalCard.style.borderColor = "#0ea5e9";
+        terminalCard.style.boxShadow = "0 0 30px rgba(14, 165, 233, 0.3)";
+
+        const firstInput = document.getElementById('in_1');
+        if (firstInput) firstInput.focus();
+    }
+
+    window.onload = () => {
+        initTerminalRow();
+    };
+</script>
+
+</body>
+</html>
