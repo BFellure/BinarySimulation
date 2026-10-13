@@ -28,7 +28,7 @@
             box-sizing: border-box;
         }
 
-        /* Sci-Fi CRT Monitor Frame with Dynamic Glow */
+        /* Sci-Fi CRT Monitor Frame */
         .terminal-card {
             background: #0f172a;
             border: 2px solid #0ea5e9;
@@ -191,27 +191,33 @@
             box-shadow: 0 0 8px #0ea5e9;
             background: #0f172a;
         }
-        .status-light {
+        
+        /* Individual Check Button */
+        .check-btn {
             margin-top: 6px;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #1e293b;
+            width: 92%;
+            background: #334155;
             border: 1px solid #475569;
-            border-radius: 4px;
-            font-size: 0.75rem;
+            color: #cbd5e1;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.6rem;
             font-weight: 800;
-            color: #64748b;
-            transition: all 0.3s ease;
+            padding: 4px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
         }
-        .status-light.active {
+        .check-btn:hover {
+            background: #0ea5e9;
+            color: #fff;
+            border-color: #38bdf8;
+        }
+        .check-btn.active {
+            background: rgba(34, 197, 94, 0.2);
             color: #4ade80;
             border-color: #22c55e;
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
-            background: rgba(34, 197, 94, 0.2);
-            transform: scale(1.08);
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
         }
 
         /* Success Override Alert */
@@ -369,7 +375,7 @@
 
         <!-- Success Message Banner -->
         <div class="success-terminal hidden" id="successBanner">
-            <div class="success-title">🚨 OVERRIDE ACCEPTED - FREQUENCY BROADCASTING 🚨</div>
+            <div class="success-title">🚨 OVERRIDE ACCEPTED 🚨</div>
             <div class="final-code-text">BITSANDPIECES</div>
         </div>
 
@@ -486,7 +492,7 @@
             unit.innerHTML = `
                 <span class="box-tag">#${item.slot}</span>
                 <input type="text" class="terminal-input" id="in_${item.slot}" maxlength="1" placeholder="-" autocomplete="off" oninput="handleInput(event, ${item.slot})">
-                <div class="status-light" id="light_${item.slot}">✓</div>
+                <button class="check-btn" id="chk_${item.slot}" onclick="checkSingleSlot(${item.slot})">CHK</button>
             `;
             row.appendChild(unit);
         });
@@ -505,77 +511,18 @@
         }
     }
 
-    function toggleDisclaimer() {
-        let box = document.getElementById('disclaimerBox');
-        if (box.classList.contains('hidden')) {
-            box.classList.remove('hidden');
+    // Check a single individual slot when its CHK button is clicked
+    function checkSingleSlot(slotNum) {
+        const item = terminalKey.find(k => k.slot === slotNum);
+        const inputVal = document.getElementById(`in_${slotNum}`).value.trim().toUpperCase();
+        const chkBtn = document.getElementById(`chk_${slotNum}`);
+
+        if (inputVal === item.char) {
+            chkBtn.textContent = "✓";
+            chkBtn.classList.add('active');
+            playKeyClickSound();
         } else {
-            box.classList.add('hidden');
-        }
-    }
-
-    function verifyTerminal() {
-        let unlockedCount = 0;
-
-        terminalKey.forEach(item => {
-            const inputVal = document.getElementById(`in_${item.slot}`).value.trim().toUpperCase();
-            const light = document.getElementById(`light_${item.slot}`);
-
-            if (inputVal === item.char) {
-                unlockedCount++;
-                light.classList.add('active');
-            } else {
-                light.classList.remove('active');
-            }
-        });
-
-        const statusReadout = document.getElementById('statusReadout');
-        statusReadout.textContent = `DECODED SLOTS: ${unlockedCount} / ${terminalKey.length}`;
-        statusReadout.classList.remove('hidden');
-
-        const alarmBadge = document.getElementById('alarmBadge');
-        const successBanner = document.getElementById('successBanner');
-        const terminalCard = document.getElementById('terminalCard');
-
-        if (unlockedCount === terminalKey.length) {
-            successBanner.classList.remove('hidden');
-            alarmBadge.textContent = "🟢 SYSTEM OVERRIDE SUCCESSFUL";
-            alarmBadge.classList.add('success');
-            terminalCard.style.borderColor = "#22c55e";
-            playSuccessChime();
-        } else {
-            successBanner.classList.add('hidden');
-            alarmBadge.textContent = "⚠️ DISTRESS LOCKOUT ACTIVE";
-            alarmBadge.classList.remove('success');
-            terminalCard.style.borderColor = "#0ea5e9";
+            chkBtn.textContent = "✗";
+            chkBtn.classList.remove('active');
             playErrorSound();
-        }
-    }
-
-    function resetTerminal() {
-        playErrorSound();
-        terminalKey.forEach(item => {
-            document.getElementById(`in_${item.slot}`).value = '';
-            const light = document.getElementById(`light_${item.slot}`);
-            light.classList.remove('active');
-        });
-        document.getElementById('statusReadout').classList.add('hidden');
-        document.getElementById('successBanner').classList.add('hidden');
-
-        const alarmBadge = document.getElementById('alarmBadge');
-        alarmBadge.textContent = "⚠️ DISTRESS LOCKOUT ACTIVE";
-        alarmBadge.classList.remove('success');
-
-        const terminalCard = document.getElementById('terminalCard');
-        terminalCard.style.borderColor = "#0ea5e9";
-
-        // Reset focus to first box
-        const firstInput = document.getElementById('in_1');
-        if (firstInput) firstInput.focus();
-    }
-
-    window.onload = initTerminalRow;
-</script>
-
-</body>
-</html>
+            setTimeout(() => { chkBtn.textContent = "CHK"; }, 80
