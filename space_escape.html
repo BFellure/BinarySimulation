@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep Space Terminal - Secret Code Decoder</title>
+    <title>Orbital Relay Terminal - Secret Code Decoder</title>
     <style>
         body {
             margin: 0;
@@ -28,7 +28,7 @@
             box-sizing: border-box;
         }
 
-        /* Sci-Fi CRT Monitor Frame (Bright & Readable) */
+        /* Sci-Fi CRT Monitor Frame */
         .terminal-card {
             background: #0f172a;
             border: 2px solid #0ea5e9;
@@ -40,7 +40,7 @@
             position: relative;
         }
 
-        /* CRT Scanline Overlay Effect (Subtle) */
+        /* CRT Scanline Overlay Effect */
         .terminal-card::before {
             content: " ";
             display: block;
@@ -81,6 +81,12 @@
             font-weight: 700;
             letter-spacing: 0.05em;
             animation: alarmPulse 1.2s infinite alternate;
+        }
+        .alarm-badge.success {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+            color: #4ade80;
+            animation: none;
         }
         @keyframes alarmPulse {
             0% { opacity: 0.6; box-shadow: 0 0 2px #ef4444; }
@@ -331,8 +337,8 @@
     <div class="terminal-card">
         <!-- Header Alarm / Status Bar -->
         <div class="terminal-header">
-            <div class="system-title">🛰️ DEEP SPACE RECOVERY CONSOLE</div>
-            <div class="alarm-badge">⚠️ DISTRESS LOCKOUT ACTIVE</div>
+            <div class="system-title">🛰️ ORBITAL RELAY TERMINAL - SECTOR 7</div>
+            <div class="alarm-badge" id="alarmBadge">⚠️ DISTRESS LOCKOUT ACTIVE</div>
         </div>
 
         <!-- Radar & Mission Briefing -->
@@ -341,7 +347,7 @@
                 <div class="radar-sweep"></div>
             </div>
             <div class="briefing-text">
-                <strong>MISSION DIRECTIVE:</strong> Enter your decoded letters into sequential slots #1 through #13 to override the communications relay and broadcast the secret distress message.
+                <strong>DIRECTIVE:</strong> Enter your decoded letters from the secret message into sequential slots #1 through #13 to override the lockout.
             </div>
         </div>
 
@@ -361,7 +367,7 @@
 
         <!-- Controls -->
         <div class="controls-bar" style="margin-top: 10px;">
-            <button class="action-btn" onclick="verifyTerminal()">[ DECODE TRANSMISSION ]</button>
+            <button class="action-btn" onclick="verifyTerminal()">[ OVERRIDE SYSTEM ]</button>
             <button class="action-btn secondary" onclick="resetTerminal()">[ RESET SYSTEM ]</button>
         </div>
 
@@ -378,7 +384,7 @@
 </div>
 
 <script>
-    // 13 Correct letters spelling B-I-T-S-A-N-D-P-I-E-C-E-S (case-insensitive checking)
+    // 13 Correct letters spelling B-I-T-S-A-N-D-P-I-E-C-E-S
     const terminalKey = [
         { slot: 1, char: 'B' },
         { slot: 2, char: 'I' },
@@ -404,11 +410,23 @@
             unit.className = 'box-unit';
             unit.innerHTML = `
                 <span class="box-tag">#${item.slot}</span>
-                <input type="text" class="terminal-input" id="in_${item.slot}" maxlength="1" placeholder="-" autocomplete="off">
+                <input type="text" class="terminal-input" id="in_${item.slot}" maxlength="1" placeholder="-" autocomplete="off" oninput="handleAutoAdvance(event, ${item.slot})">
                 <div class="status-light" id="light_${item.slot}">✓</div>
             `;
             row.appendChild(unit);
         });
+    }
+
+    // Auto-advance cursor to the next input box when full
+    function handleAutoAdvance(e, currentSlot) {
+        const input = e.target;
+        if (input.value.length >= 1 && currentSlot < 13) {
+            const nextInput = document.getElementById(`in_${currentSlot + 1}`);
+            if (nextInput) {
+                nextInput.focus();
+                nextInput.select();
+            }
+        }
     }
 
     function toggleDisclaimer() {
@@ -439,11 +457,17 @@
         statusReadout.textContent = `DECODED SLOTS: ${unlockedCount} / ${terminalKey.length}`;
         statusReadout.classList.remove('hidden');
 
+        const alarmBadge = document.getElementById('alarmBadge');
         const successBanner = document.getElementById('successBanner');
+
         if (unlockedCount === terminalKey.length) {
             successBanner.classList.remove('hidden');
+            alarmBadge.textContent = "🟢 SYSTEM OVERRIDE SUCCESSFUL";
+            alarmBadge.classList.add('success');
         } else {
             successBanner.classList.add('hidden');
+            alarmBadge.textContent = "⚠️ DISTRESS LOCKOUT ACTIVE";
+            alarmBadge.classList.remove('success');
         }
     }
 
@@ -455,6 +479,14 @@
         });
         document.getElementById('statusReadout').classList.add('hidden');
         document.getElementById('successBanner').classList.add('hidden');
+
+        const alarmBadge = document.getElementById('alarmBadge');
+        alarmBadge.textContent = "⚠️ DISTRESS LOCKOUT ACTIVE";
+        alarmBadge.classList.remove('success');
+
+        // Reset focus to first box
+        const firstInput = document.getElementById('in_1');
+        if (firstInput) firstInput.focus();
     }
 
     window.onload = initTerminalRow;
