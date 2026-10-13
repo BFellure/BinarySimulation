@@ -162,6 +162,7 @@
             margin-bottom: 15px;
             position: relative;
             z-index: 3;
+            width: 100%;
         }
 
         /* Individual Box Unit */
@@ -192,7 +193,7 @@
             border: 1px solid #475569;
             color: #ffffff;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 800;
             text-align: center;
             padding: 6px 0;
@@ -389,7 +390,7 @@
 
         <!-- 13 Boxes in a Single Straight Horizontal Row -->
         <div class="single-row-grid" id="boxRow">
-            <!-- Generated dynamically on window load -->
+            <!-- Generated dynamically -->
         </div>
 
         <!-- Success Message Banner -->
@@ -511,6 +512,7 @@
 
     function initTerminalRow() {
         const row = document.getElementById('boxRow');
+        if (!row) return;
         row.innerHTML = '';
 
         terminalKey.forEach(item => {
@@ -538,6 +540,7 @@
     }
 
     function checkSingleSlot(slotNum) {
+        initAudio();
         const item = terminalKey.find(k => k.slot === slotNum);
         const inputVal = document.getElementById(`in_${slotNum}`).value.trim().toUpperCase();
         const chkBtn = document.getElementById(`chk_${slotNum}`);
@@ -575,8 +578,10 @@
 
             if (inputVal === item.char) {
                 unlockedCount++;
-                chkBtn.textContent = "✓";
-                chkBtn.classList.add('active');
+                if (chkBtn) {
+                    chkBtn.textContent = "✓";
+                    chkBtn.classList.add('active');
+                }
             }
         });
 
@@ -605,6 +610,7 @@
     }
 
     function verifyTerminal() {
+        initAudio();
         evaluateOverallState();
         let unlockedCount = terminalKey.filter(item => {
             return document.getElementById(`in_${item.slot}`).value.trim().toUpperCase() === item.char;
@@ -617,6 +623,7 @@
     }
 
     function resetTerminal() {
+        initAudio();
         playErrorSound();
         triggerGlitchShake();
         terminalKey.forEach(item => {
@@ -640,9 +647,8 @@
         if (firstInput) firstInput.focus();
     }
 
-    window.onload = () => {
-        initTerminalRow();
-    };
+    // Execute immediately on script load to guarantee box generation
+    initTerminalRow();
 </script>
 
 </body>
