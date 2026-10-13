@@ -28,7 +28,7 @@
             box-sizing: border-box;
         }
 
-        /* Sci-Fi CRT Monitor Frame */
+        /* Sci-Fi CRT Monitor Frame with Dynamic Glow */
         .terminal-card {
             background: #0f172a;
             border: 2px solid #0ea5e9;
@@ -38,6 +38,12 @@
             width: 100%;
             box-sizing: border-box;
             position: relative;
+            animation: crtFlicker 0.15s infinite;
+        }
+        @keyframes crtFlicker {
+            0% { opacity: 0.99; }
+            50% { opacity: 1; }
+            100% { opacity: 0.995; }
         }
 
         /* CRT Scanline Overlay Effect */
@@ -46,11 +52,11 @@
             display: block;
             position: absolute;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.18) 50%);
             background-size: 100% 4px;
             z-index: 2;
             pointer-events: none;
-            opacity: 0.4;
+            opacity: 0.5;
         }
 
         /* Header / Alarm Status Bar */
@@ -114,6 +120,7 @@
             position: relative;
             background: radial-gradient(circle, rgba(14,165,233,0.3) 0%, rgba(15,23,42,0.9) 70%);
             flex-shrink: 0;
+            overflow: hidden;
         }
         .radar-sweep {
             position: absolute;
@@ -177,10 +184,11 @@
             outline: none;
             text-transform: uppercase;
             box-sizing: border-box;
+            transition: background 0.2s, border-color 0.2s;
         }
         .terminal-input:focus {
             border-color: #38bdf8;
-            box-shadow: 0 0 6px #0ea5e9;
+            box-shadow: 0 0 8px #0ea5e9;
             background: #0f172a;
         }
         .status-light {
@@ -196,12 +204,14 @@
             font-size: 0.75rem;
             font-weight: 800;
             color: #64748b;
+            transition: all 0.3s ease;
         }
         .status-light.active {
             color: #4ade80;
             border-color: #22c55e;
-            box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
-            background: rgba(34, 197, 94, 0.15);
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
+            background: rgba(34, 197, 94, 0.2);
+            transform: scale(1.08);
         }
 
         /* Success Override Alert */
@@ -214,12 +224,12 @@
             margin-bottom: 15px;
             position: relative;
             z-index: 3;
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.35);
             animation: glowSuccess 1.5s infinite alternate;
         }
         @keyframes glowSuccess {
             from { box-shadow: 0 0 5px rgba(34, 197, 94, 0.2); }
-            to { box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); }
+            to { box-shadow: 0 0 25px rgba(34, 197, 94, 0.7); }
         }
         .success-title {
             color: #4ade80;
@@ -233,7 +243,7 @@
             font-weight: 900;
             letter-spacing: 0.25em;
             margin-top: 5px;
-            text-shadow: 0 0 8px #22c55e;
+            text-shadow: 0 0 10px #22c55e;
         }
 
         /* Control Buttons */
@@ -262,6 +272,7 @@
         .action-btn:hover {
             background: #0369a1;
             box-shadow: 0 0 15px rgba(2, 132, 199, 0.7);
+            transform: translateY(-1px);
         }
         .action-btn.secondary {
             background: #334155;
@@ -334,7 +345,7 @@
 <body>
 
 <div class="main-container">
-    <div class="terminal-card">
+    <div class="terminal-card" id="terminalCard">
         <!-- Header Alarm / Status Bar -->
         <div class="terminal-header">
             <div class="system-title">🛰️ ORBITAL RELAY TERMINAL - SECTOR 7</div>
@@ -401,6 +412,70 @@
         { slot: 13, char: 'S' }
     ];
 
+    // Web Audio API Sound Generator for Terminal Effects
+    let audioCtx = null;
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function playKeyClickSound() {
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.03);
+            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.03);
+        } catch (e) {}
+    }
+
+    function playSuccessChime() {
+        try {
+            initAudio();
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            notes.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + index * 0.08);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime + index * 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + index * 0.08 + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + index * 0.08);
+                osc.stop(audioCtx.currentTime + index * 0.08 + 0.3);
+            });
+        } catch (e) {}
+    }
+
+    function playErrorSound() {
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(120, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        } catch (e) {}
+    }
+
     function initTerminalRow() {
         const row = document.getElementById('boxRow');
         row.innerHTML = '';
@@ -410,15 +485,16 @@
             unit.className = 'box-unit';
             unit.innerHTML = `
                 <span class="box-tag">#${item.slot}</span>
-                <input type="text" class="terminal-input" id="in_${item.slot}" maxlength="1" placeholder="-" autocomplete="off" oninput="handleAutoAdvance(event, ${item.slot})">
+                <input type="text" class="terminal-input" id="in_${item.slot}" maxlength="1" placeholder="-" autocomplete="off" oninput="handleInput(event, ${item.slot})">
                 <div class="status-light" id="light_${item.slot}">✓</div>
             `;
             row.appendChild(unit);
         });
     }
 
-    // Auto-advance cursor to the next input box when full
-    function handleAutoAdvance(e, currentSlot) {
+    // Auto-advance cursor and play mechanical keystroke sound
+    function handleInput(e, currentSlot) {
+        playKeyClickSound();
         const input = e.target;
         if (input.value.length >= 1 && currentSlot < 13) {
             const nextInput = document.getElementById(`in_${currentSlot + 1}`);
@@ -459,19 +535,25 @@
 
         const alarmBadge = document.getElementById('alarmBadge');
         const successBanner = document.getElementById('successBanner');
+        const terminalCard = document.getElementById('terminalCard');
 
         if (unlockedCount === terminalKey.length) {
             successBanner.classList.remove('hidden');
             alarmBadge.textContent = "🟢 SYSTEM OVERRIDE SUCCESSFUL";
             alarmBadge.classList.add('success');
+            terminalCard.style.borderColor = "#22c55e";
+            playSuccessChime();
         } else {
             successBanner.classList.add('hidden');
             alarmBadge.textContent = "⚠️ DISTRESS LOCKOUT ACTIVE";
             alarmBadge.classList.remove('success');
+            terminalCard.style.borderColor = "#0ea5e9";
+            playErrorSound();
         }
     }
 
     function resetTerminal() {
+        playErrorSound();
         terminalKey.forEach(item => {
             document.getElementById(`in_${item.slot}`).value = '';
             const light = document.getElementById(`light_${item.slot}`);
@@ -483,6 +565,9 @@
         const alarmBadge = document.getElementById('alarmBadge');
         alarmBadge.textContent = "⚠️ DISTRESS LOCKOUT ACTIVE";
         alarmBadge.classList.remove('success');
+
+        const terminalCard = document.getElementById('terminalCard');
+        terminalCard.style.borderColor = "#0ea5e9";
 
         // Reset focus to first box
         const firstInput = document.getElementById('in_1');
